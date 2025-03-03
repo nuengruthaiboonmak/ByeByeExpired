@@ -1,8 +1,11 @@
 import React from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+
 import { LinearGradient } from "expo-linear-gradient";
 
-export default function LoginScreen() {
+
+const LoginScreen = ({ navigation }) => {
+
   return (
     <LinearGradient colors={["#E8A0F1", "#FAD0EC"]} style={styles.container}>
       <Text style={styles.title}>ByeByeExpired</Text>
@@ -16,7 +19,7 @@ export default function LoginScreen() {
         <TextInput style={styles.input} keyboardType="email-address" />
         <Text style={styles.label}>Password</Text>
         <TextInput style={styles.input} secureTextEntry />
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Overview")}>
           <Text style={styles.buttonText}>Log In</Text>
         </TouchableOpacity>
         <Text style={styles.footerText}>
@@ -87,4 +90,6 @@ const styles = StyleSheet.create({
     color: "#C084FC",
     fontWeight: "bold",
   },
-});
+})
+
+export default LoginScreen;
