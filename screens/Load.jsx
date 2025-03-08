@@ -9,7 +9,7 @@ const LoadScreen = ({ navigation }) => {
   }, [navigation]);
 
   return (
-    <ImageBackground source={require("../assets/images/load.png")} style={styles.background}>
+    <ImageBackground source={require("../assets/images/Load.png")} style={styles.background}>
       <View style={styles.overlay}>
         <ActivityIndicator size="large" color="#ffffff" />
         <Text style={styles.text}>Loading...</Text>
