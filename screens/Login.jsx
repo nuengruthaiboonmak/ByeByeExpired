@@ -20,7 +20,7 @@ const LoginScreen = ({ navigation }) => {
         <Text style={styles.label}>Password</Text>
         <TextInput style={styles.input} secureTextEntry />
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Overview")}>
-          <Text style={styles.buttonText}>Log In</Text>
+          <Text style={styles.buttonText}>Log In!</Text>
         </TouchableOpacity>
         <Text style={styles.footerText}>
           Don’t have an account yet? <Text style={styles.signUpText}>Sign Up</Text>
