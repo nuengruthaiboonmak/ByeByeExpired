@@ -8,10 +8,10 @@ const { width } = Dimensions.get("window"); // ดึงขนาดหน้า
 
 const ProfileScreen = ({ navigation }) => {
   return (
-    <ImageBackground source={require("../assets/images/background profile.png")} style={styles.background}>
+    <ImageBackground source={require("../assets/images/background.jpg")} style={styles.background}>
       
       {/* ภาพพื้นหลังของโปรไฟล์ */}
-      <Image source={require("../assets/images/ground profile.png")} style={styles.profileBackground} />
+      <Image source={require("../assets/images/background.jpg")} style={styles.profileBackground} />
 
       {/* คำว่า My Profile พร้อมพื้นหลัง */}
       <View style={styles.myProfileContainer}>
@@ -23,12 +23,12 @@ const ProfileScreen = ({ navigation }) => {
         style={styles.topRightButton} 
         onPress={() => navigation.navigate("Overview")}
       >
-        <Image source={require("../assets/images/home.png")} style={styles.topRightIcon} />
+        <Image source={require("../assets/images/background.jpg")} style={styles.topRightIcon} />
       </TouchableOpacity>
 
       {/* กรอบโปรไฟล์ */}
       <View style={styles.profileContainer}>
-        <Image source={require("../assets/images/profile11.png")} style={styles.profileImage} />
+        <Image source={require("../assets/images/background.jpg")} style={styles.profileImage} />
         <Text style={styles.profileName}>Ebola Coronana</Text>
         <Text style={styles.profileEmail}>ebolacoronana@gmail.com</Text>
       </View>

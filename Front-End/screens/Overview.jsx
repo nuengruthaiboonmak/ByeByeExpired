@@ -276,16 +276,15 @@ export default function App() {
       </View>
 
       <TouchableOpacity
-        style={{ position: "absolute", bottom: 65, alignSelf: "center", backgroundColor: "#6C74FF", borderRadius: 50, padding: 8 }}
+        style={{ position: "absolute", bottom: 65, alignSelf: "center", backgroundColor: "#6C74FF", borderRadius: 100, padding: 2}}
         onPress={() => setBottomSheetVisible(true)} // กดแล้วเปิด Bottom Sheet
       >
-        <MaterialIcons name="add" size={30} color="#FFF" />
+        <Text style={{ fontSize: 30, fontWeight: 'bold', color: 'white' }}> + </Text>
       </TouchableOpacity>
 
       {/* Bottom Sheet แสดงหน้า Add Product */}
       <BottomSheet isVisible={isBottomSheetVisible}>
-        <View style={{padding: 0, borderBottomLeftRadius: 30,
- borderBottomRightRadius: 30,height: "90%" }}>
+        <View style={{padding: 0, borderBottomLeftRadius: 30, borderBottomRightRadius: 30,height: "90%" }}>
           <AddProductScreen
             onClose={() => setBottomSheetVisible(false)} // ส่ง prop ไปให้ปิดได้
           />
