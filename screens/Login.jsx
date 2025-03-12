@@ -1,19 +1,16 @@
 import React from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
-
-import { LinearGradient } from "expo-linear-gradient";
-
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
 
 const LoginScreen = ({ navigation }) => {
-
   return (
-    <LinearGradient colors={["#E8A0F1", "#FAD0EC"]} style={styles.container}>
-      <Text style={styles.title}>ByeByeExpired</Text>
-      <Text style={styles.subtitle}>
-        <Text style={{ fontWeight: "bold" }}>Never waste food again! </Text>
+    <ImageBackground source={require("../assets/images/background.jpg")} style={styles.container}>
+      <Text style={styles.firstSubtitle}>
+        <Text style={{ fontWeight: "bold",color: "#6c9de8"}}>Never waste food again! </Text>
         Our app reminds you of expiration dates and helps you manage your food,
         ensuring you use your ingredients before they go bad!
       </Text>
+      <Text style={styles.subtitle}>________________________________________</Text>
+      <Text style={styles.title}>Log In</Text>
       <View style={styles.formContainer}>
         <Text style={styles.label}>Email address</Text>
         <TextInput style={styles.input} keyboardType="email-address" />
@@ -23,10 +20,16 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.buttonText}>Log In</Text>
         </TouchableOpacity>
         <Text style={styles.footerText}>
-          Don’t have an account yet? <Text style={styles.signUpText}>Sign Up</Text>
+          Don’t have an account yet? 
+          <Text 
+            style={styles.signUpText} 
+            onPress={() => navigation.navigate("Register")}
+          >
+            Sign Up
+          </Text>
         </Text>
       </View>
-    </LinearGradient>
+    </ImageBackground>
   );
 }
 
@@ -38,16 +41,24 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: "#fff",
-    fontFamily: "serif",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 14,
+    fontSize: 20,
     textAlign: "center",
-    color: "#fff",
+    color: "#aa64aa",
+    fontWeight: "600",
+    marginBottom: 20,
+  },
+  firstSubtitle: {
+    marginTop: 250, 
+    fontSize: 16,
+    textAlign: "left",
+    color: "#d59ac5",
+    marginBottom: 20,
+  },
+  
+  subtitle: {
+    fontSize: 16,
+    textAlign: "left",
+    color: "#d59ac5",
     marginBottom: 20,
   },
   formContainer: {
@@ -58,7 +69,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: "#444",
+    color: "#d59ac5",
     marginBottom: 5,
   },
   input: {
@@ -67,29 +78,30 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 15,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: "#f1d4e4",
   },
   button: {
-    backgroundColor: "#C084FC",
+    backgroundColor: "#ffe9f2",
     padding: 12,
     borderRadius: 20,
     alignItems: "center",
     marginTop: 10,
   },
   buttonText: {
-    color: "#fff",
+    color: "#6a367a",
     fontSize: 16,
-    fontWeight: "bold",
+    fontWeight: "600",
   },
   footerText: {
     marginTop: 15,
     textAlign: "center",
-    color: "#666",
+    color: "#6a367a",
   },
   signUpText: {
-    color: "#C084FC",
+    color: "#e81b7e",
     fontWeight: "bold",
   },
-})
+});
 
 export default LoginScreen;
+
