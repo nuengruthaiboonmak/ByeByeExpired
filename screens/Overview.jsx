@@ -274,7 +274,8 @@ export default function App() {
 
       {/* Bottom Sheet แสดงหน้า Add Product */}
       <BottomSheet isVisible={isBottomSheetVisible}>
-        <View style={{ backgroundColor: "#fff", padding: 20, height: "90%" }}>
+        <View style={{padding: 0, borderBottomLeftRadius: 30,
+ borderBottomRightRadius: 30,height: "90%" }}>
           <AddProductScreen
             onClose={() => setBottomSheetVisible(false)} // ส่ง prop ไปให้ปิดได้
           />
