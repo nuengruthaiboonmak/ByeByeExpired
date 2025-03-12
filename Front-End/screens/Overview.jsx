@@ -276,20 +276,20 @@ export default function App() {
       </View>
 
       <TouchableOpacity
-        style={{ position: "absolute", bottom: 65, alignSelf: "center", backgroundColor: "#6C74FF", borderRadius: 100, padding: 2}}
-        onPress={() => setBottomSheetVisible(true)} // กดแล้วเปิด Bottom Sheet
+        style={{
+          position: "absolute",
+          bottom: 65,
+          alignSelf: "center",
+          backgroundColor: "#6C74FF",
+          borderRadius: 100,
+          padding: 2,
+          height: 45,
+          width: 45
+        }}
+        onPress={() => navigation.navigate("AddProduct")} // เปลี่ยนให้ไปยังหน้า AddProduct
       >
-        <Text style={{ fontSize: 30, fontWeight: 'bold', color: 'white' }}> + </Text>
+        <Text style={{ fontSize: 35, fontWeight: 'normal', color: 'white', alignSelf: "center",bottom: 3}}> + </Text>
       </TouchableOpacity>
-
-      {/* Bottom Sheet แสดงหน้า Add Product */}
-      <BottomSheet isVisible={isBottomSheetVisible}>
-        <View style={{padding: 0, borderBottomLeftRadius: 30, borderBottomRightRadius: 30,height: "90%" }}>
-          <AddProductScreen
-            onClose={() => setBottomSheetVisible(false)} // ส่ง prop ไปให้ปิดได้
-          />
-        </View>
-      </BottomSheet>
     </View >
   );
 }
