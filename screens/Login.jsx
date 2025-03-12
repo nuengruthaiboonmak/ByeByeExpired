@@ -20,12 +20,12 @@ const LoginScreen = ({ navigation }) => {
           <Text style={styles.buttonText}>Log In</Text>
         </TouchableOpacity>
         <Text style={styles.footerText}>
-          Don’t have an account yet? 
+          Don’t have an account yet?{" "}
           <Text 
             style={styles.signUpText} 
             onPress={() => navigation.navigate("Register")}
           >
-            Sign Up
+            Create an account
           </Text>
         </Text>
       </View>
