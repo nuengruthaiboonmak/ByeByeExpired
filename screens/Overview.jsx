@@ -74,6 +74,7 @@ export default function App() {
             </Text>
           </View>
         </View>
+
         <TouchableOpacity
           style={{
             backgroundColor: "#FFF",
@@ -83,18 +84,20 @@ export default function App() {
             height: 35,
             justifyContent: "center",
             alignItems: "center",
-            shadowColor: "#000", // สีเงา
-            shadowOffset: { width: 0, height: 2 }, // การกระจายเงา
-            shadowOpacity: 0.2, // ความเข้มของเงา
-            shadowRadius: 3, // ความฟุ้งของเงา
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 3,
             elevation: 4,
           }}
+          onPress={() => navigation.navigate("Login")} // เพิ่มการนำทางไปหน้า Login
         >
           <Image
             source={require("../assets/images/exit.png")}
             style={{ width: 35, height: 35 }}
           />
         </TouchableOpacity>
+
       </View>
 
       <ScrollView>
@@ -116,9 +119,11 @@ export default function App() {
             </View>
           </LinearGradient>
 
-          <ScrollView horizontal>
-            <NearlyExpired />
-          </ScrollView>
+          <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 110, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 5 }}>
+            <ScrollView horizontal>
+              <NearlyExpired />
+            </ScrollView>
+          </View>
         </View>
 
         <View style={{ marginVertical: 10, marginTop: 20 }}>
@@ -139,31 +144,33 @@ export default function App() {
             </View>
           </LinearGradient>
 
-          <ScrollView horizontal>
-            <Expired />
-          </ScrollView>
+          <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 110, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 5 }}>
+            <ScrollView horizontal>
+              <Expired />
+            </ScrollView>
+          </View>
+
+          <View style={{ marginVertical: 10, marginTop: 20 }}>
+            <LinearGradient
+              colors={["#BBE9FF", "#E1FCFE"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={{ padding: 8, borderRadius: 30 }}
+            >
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Image
+                  source={require("../assets/images/S.png")}
+                  style={{ width: 25, height: 25, marginRight: 8 }}
+                />
+                <Text style={{ fontWeight: "bold", fontSize: 16, color: "#263DD3" }}>
+                  Storage
+                </Text>
+              </View>
+            </LinearGradient>
+          </View>
         </View>
 
-        <View style={{ marginVertical: 10, marginTop: 20 }}>
-          <LinearGradient
-            colors={["#BBE9FF", "#E1FCFE"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{ padding: 8, borderRadius: 30 }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image
-                source={require("../assets/images/S.png")}
-                style={{ width: 25, height: 25, marginRight: 8 }}
-              />
-              <Text style={{ fontWeight: "bold", fontSize: 16, color: "#263DD3" }}>
-                Storage
-              </Text>
-            </View>
-          </LinearGradient>
-        </View>
-
-        <View style={{ margin: 10 }}>
+        <View style={{ margin: 10, marginBottom: 130 }}>
           <Card style={{ padding: 1, borderRadius: 30, overflow: "hidden" }}>
             {storage.map((item, idx) => (
               <TouchableOpacity key={idx} onPress={() => navigation.navigate(item.screen)}>
@@ -192,84 +199,87 @@ export default function App() {
         </View>
       </ScrollView>
 
-      <View
-        style={{
-          position: "absolute",
-          bottom: -250, // ขยับลงมาเพื่อให้โค้งลอยขึ้นมา
-          left: -200,
-          right: -200,
-          height: 350, // เพิ่มความสูงเพื่อให้ขอบบนโค้งขึ้น
-          backgroundColor: "#FFF",
-          borderTopLeftRadius: 500, // เพิ่มความโค้งมากขึ้น
-          borderTopRightRadius: 500,
-          overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: -3 },
-          shadowOpacity: 0.1,
-          shadowRadius: 15,
-          elevation: 15,
-          justifyContent: "center", // จัดกลางแนวตั้ง
-          alignItems: "center", // จัดกลางแนวนอน
-        }}
-      />
-
-      <View
-        style={{
-          flexDirection: "row",
-          width: "90%", // ลดความกว้างเพื่อให้ปุ่มอยู่ในกรอบ
-        }}
-      >
-
-        <TouchableOpacity
+      {/*bottom*/}
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 0, marginTop: 0 }}>
+        <View
           style={{
             position: "absolute",
-            bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-            left: 30, // ห่างจากขอบซ้าย
+            bottom: -280, // ขยับลงมาเพื่อให้โค้งลอยขึ้นมา
+            left: -210,
+            right: -210,
+            height: 350, // เพิ่มความสูงเพื่อให้ขอบบนโค้งขึ้น
+            backgroundColor: "#FFF",
+            borderTopLeftRadius: 500, // เพิ่มความโค้งมากขึ้น
+            borderTopRightRadius: 500,
+            overflow: "hidden",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: -3 },
+            shadowOpacity: 0.1,
+            shadowRadius: 15,
+            elevation: 15,
+            justifyContent: "center", // จัดกลางแนวตั้ง
+            alignItems: "center", // จัดกลางแนวนอน
           }}
-          onPress={() => navigation.navigate("AllProduct")} // เพิ่มการนำทางเมื่อกด
-        >
-          <Image source={require("../assets/images/button1.png")} style={{ width: 25, height:25 }} />
-        </TouchableOpacity>
+        />
 
-        <TouchableOpacity
+        <View
           style={{
-            position: "absolute",
-            bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-            left: 110, // ห่างจากขอบซ้าย
+            flexDirection: "row",
+            width: "90%", // ลดความกว้างเพื่อให้ปุ่มอยู่ในกรอบ
           }}
-          onPress={() => navigation.navigate("NearlyExpired")} // เพิ่มการนำทางเมื่อกด
         >
-          <Image source={require("../assets/images/button2.png")} style={{ width: 30, height:30 }} />
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-            left: 210, // ห่างจากขอบซ้าย
-          }}
-          onPress={() => navigation.navigate("Expired")} // เพิ่มการนำทางเมื่อกด
-        >
-          <Image source={require("../assets/images/button3.png")} style={{ width: 30, height:30 }} />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
+              left: 30, // ห่างจากขอบซ้าย
+            }}
+            onPress={() => navigation.navigate("AllProduct")} // เพิ่มการนำทางเมื่อกด
+          >
+            <Image source={require("../assets/images/button1.png")} style={{ width: 22, height: 22 }} />
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-            left: 300, // ห่างจากขอบซ้าย
-          }}
-          onPress={() => navigation.navigate("Profile")} // เพิ่มการนำทางเมื่อกด
-        >
-          <Image source={require("../assets/images/button4.png")} style={{ width: 25, height:25 }} />
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              bottom: 8, // ตั้งปุ่มให้ห่างจากขอบล่าง
+              left: 110, // ห่างจากขอบซ้าย
+            }}
+            onPress={() => navigation.navigate("NearlyExpired")} // เพิ่มการนำทางเมื่อกด
+          >
+            <Image source={require("../assets/images/button2.png")} style={{ width: 27, height: 27 }} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              bottom: 8, // ตั้งปุ่มให้ห่างจากขอบล่าง
+              left: 210, // ห่างจากขอบซ้าย
+            }}
+            onPress={() => navigation.navigate("Expired")} // เพิ่มการนำทางเมื่อกด
+          >
+            <Image source={require("../assets/images/button3.png")} style={{ width: 27, height: 27 }} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
+              left: 300, // ห่างจากขอบซ้าย
+            }}
+            onPress={() => navigation.navigate("Profile")} // เพิ่มการนำทางเมื่อกด
+          >
+            <Image source={require("../assets/images/button4.png")} style={{ width: 22, height: 22 }} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <TouchableOpacity
-        style={{ position: "absolute", bottom: 75, alignSelf: "center", backgroundColor: "#6C74FF", borderRadius: 50, padding: 8 }}
+        style={{ position: "absolute", bottom: 65, alignSelf: "center", backgroundColor: "#6C74FF", borderRadius: 50, padding: 8 }}
         onPress={() => setBottomSheetVisible(true)} // กดแล้วเปิด Bottom Sheet
       >
-        <MaterialIcons name="add" size={35} color="#FFF" />
+        <MaterialIcons name="add" size={30} color="#FFF" />
       </TouchableOpacity>
 
       {/* Bottom Sheet แสดงหน้า Add Product */}
