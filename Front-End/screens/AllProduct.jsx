@@ -16,6 +16,10 @@ const AllProductScreen = ({ navigation }) => {
     navigation.navigate("Overview");
   };
 
+  const handleGoToNext = () => {
+    navigation.navigate("Login");
+  };
+
   const handleProductPress = (product) => {
     navigation.navigate("ShowDetailProduct", { product });
   };
@@ -43,8 +47,16 @@ const AllProductScreen = ({ navigation }) => {
         )}
         ListEmptyComponent={<Text style={styles.emptyText}>No products available</Text>}
       />
-    </LinearGradient>
-  );
+    <TouchableOpacity style={styles.rightArrowButton} onPress={handleGoToNext}>
+                <View style={styles.rightArrowButtonCircle}>
+                  <Image
+                    source={require("../assets/images/exit.png")}
+                    style={{ width: 35, height: 35 }}
+                  />
+                </View>
+              </TouchableOpacity>
+            </LinearGradient>
+    );
 };
 
 const styles = StyleSheet.create({
@@ -116,6 +128,30 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#D9534F",
   },
+  rightArrowButton: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+  },
+  rightArrowButtonCircle: {
+    width: 35,
+    height: 35,
+    borderRadius: 18,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+  },
+  rightArrowImage: {
+    width: 20,
+    height: 20,
+    resizeMode: "contain",
+  },
+
 });
 
 export default AllProductScreen;
