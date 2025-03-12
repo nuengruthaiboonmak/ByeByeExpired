@@ -24,8 +24,44 @@ export default function App() {
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="Overview" component={OverviewScreen} />
-      <Stack.Screen name="AddProduct" component={AddProductScreen} />
-      <Stack.Screen name="ShowDetailProduct" component={ShowDetailProductScreen} />
+      <Stack.Screen name="AddProduct" component={AddProductScreen} 
+        options={{
+          gestureEnabled: true, // ให้สามารถลากกลับได้
+          cardStyleInterpolator: ({ current, next, layouts }) => {
+            return {
+              cardStyle: {
+                transform: [
+                  {
+                    translateY: current.progress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [layouts.screen.height, 0],
+                    }),
+                  },
+                ],
+              },
+            };
+          },
+        }}
+      />
+      <Stack.Screen name="ShowDetailProduct" component={ShowDetailProductScreen} 
+        options={{
+          gestureEnabled: true, // ให้สามารถลากกลับได้
+          cardStyleInterpolator: ({ current, next, layouts }) => {
+            return {
+              cardStyle: {
+                transform: [
+                  {
+                    translateY: current.progress.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [layouts.screen.height, 0],
+                    }),
+                  },
+                ],
+              },
+            };
+          },
+        }}
+      />
       <Stack.Screen name="StorageFridge" component={StorageFridgeScreen} />
       <Stack.Screen name="StorageFreezer" component={StorageFreezerScreen} />
       <Stack.Screen name="StorageDryFood" component={StorageDryFoodScreen} />

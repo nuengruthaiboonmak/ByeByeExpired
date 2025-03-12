@@ -41,7 +41,12 @@ const AddProductScreen = ({ navigation }) => {
       Alert.alert("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
-    Alert.alert("ข้อมูลผลิตภัณฑ์ถูกบันทึกแล้ว");
+    Alert.alert("ข้อมูลผลิตภัณฑ์ถูกบันทึกแล้ว", "", [
+      {
+        text: "OK",
+        onPress: () => navigation.goBack(),  // กลับไปหน้าก่อนหน้า
+      },
+    ]);
   };
 
   const [showStorageDatePicker, setShowStorageDatePicker] = useState(false);
@@ -58,7 +63,7 @@ const AddProductScreen = ({ navigation }) => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
+    
       <View style={styles.container}>
         {/* Gradient Background */}
         <LinearGradient
@@ -71,7 +76,7 @@ const AddProductScreen = ({ navigation }) => {
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
-          <Text style={styles.title}>New Product</Text>
+          <Text style={styles.title}>Show Product</Text>
           <TouchableOpacity onPress={saveProduct}>
             <Text style={styles.saveText}>Save</Text>
           </TouchableOpacity>
@@ -87,7 +92,7 @@ const AddProductScreen = ({ navigation }) => {
             )}
           </View>
         </TouchableOpacity>
-
+        
         <View style={styles.formContainer}>
           <Text style={styles.label}>Name</Text>
           <TextInput
@@ -181,7 +186,6 @@ const AddProductScreen = ({ navigation }) => {
           </View>
         )}
       </View>
-    </TouchableWithoutFeedback>
   );
 };
 
