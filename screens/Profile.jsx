@@ -38,7 +38,7 @@ const ProfileScreen = ({ navigation }) => {
         style={styles.signOutButton}
         onPress={() => navigation.navigate("Login")}
       >
-        <Text style={styles.buttonText}>Sign Out</Text>
+        <Text style={styles.buttonText}>Log Out</Text>
       </TouchableOpacity>
       
     </ImageBackground>
@@ -53,7 +53,8 @@ const styles = StyleSheet.create({
   },
   profileBackground: {
     position: "absolute",
-    top: 118,
+    top: 121,
+    right: -5,
     width: width,
     height: width * 0.5,
     resizeMode: "contain",
@@ -66,10 +67,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    
   },
   myProfileText: {
     fontSize: 16,
@@ -78,8 +76,8 @@ const styles = StyleSheet.create({
   },
   topRightButton: {
     position: "absolute",
-    top: 35,
-    right: 20,
+    top: 40,
+    right: 25,
     width: 46,  
     height: 40,
     justifyContent: "center",
@@ -92,10 +90,10 @@ const styles = StyleSheet.create({
   },
   profileContainer: {
     position: "absolute",
-    top: width * 0.22,
+    top: width * 0.20,
     width: "85%",
     alignItems: "center",
-    padding: 25,
+    padding: 20,
   },
   profileImage: {
     width: 135,
@@ -115,8 +113,8 @@ const styles = StyleSheet.create({
   },
   signOutButton: {
     position: "absolute",
-    bottom: 20,
-    right: 20,
+    bottom: 30,
+    right: 25,
     backgroundColor: "#ffe9f2",
     paddingVertical: 10,
     paddingHorizontal: 20,
@@ -128,7 +126,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#6a367a",
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: "bold",
   },
 });
