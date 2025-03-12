@@ -195,13 +195,13 @@ export default function App() {
       <View
         style={{
           position: "absolute",
-          bottom: -200, // ขยับลงมาเพื่อให้โค้งลอยขึ้นมา
-          left: -160,
-          right: -160,
-          height: 300, // เพิ่มความสูงเพื่อให้ขอบบนโค้งขึ้น
+          bottom: -250, // ขยับลงมาเพื่อให้โค้งลอยขึ้นมา
+          left: -200,
+          right: -200,
+          height: 350, // เพิ่มความสูงเพื่อให้ขอบบนโค้งขึ้น
           backgroundColor: "#FFF",
-          borderTopLeftRadius: 900, // เพิ่มความโค้งมากขึ้น
-          borderTopRightRadius: 900,
+          borderTopLeftRadius: 500, // เพิ่มความโค้งมากขึ้น
+          borderTopRightRadius: 500,
           overflow: "hidden",
           shadowColor: "#000",
           shadowOffset: { width: 0, height: -3 },
