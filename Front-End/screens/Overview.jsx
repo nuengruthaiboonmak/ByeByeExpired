@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from "react-native";
-import { Card } from "react-native-paper";
+import { Card, IconButton } from "react-native-paper";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import NearlyExpired from "./NearlyExpired";
-import Expired from "./Expired";
+import { BottomSheet } from "react-native-elements";
 import AddProductScreen from "./AddProduct"; // นำเข้าหน้า Add Product
 
 // ตัวอย่างข้อมูลที่เก็บรายการอาหารในแต่ละประเภท
@@ -20,6 +20,7 @@ const storage = [
 
 export default function App() {
   const [currentDate, setCurrentDate] = useState("");
+  const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -169,30 +170,7 @@ export default function App() {
           </View>
         </View>
 
-<<<<<<< HEAD:Front-End/screens/Overview.jsx
         <View style={{ margin: 10, marginBottom: 130 }}>
-=======
-        <View style={{ marginVertical: 10, marginTop: 20 }}>
-          <LinearGradient
-            colors={["#BBE9FF", "#E1FCFE"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{ padding: 8, borderRadius: 30 }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image
-                source={require("../assets/images/S.png")}
-                style={{ width: 25, height: 25, marginRight: 8 }}
-              />
-              <Text style={{ fontWeight: "bold", fontSize: 16, color: "#263DD3" }}>
-                Storage
-              </Text>
-            </View>
-          </LinearGradient>
-        </View>
-
-        <View style={{ margin: 10 }}>
->>>>>>> origin/bottomNew:screens/Overview.jsx
           <Card style={{ padding: 1, borderRadius: 30, overflow: "hidden" }}>
             {storage.map((item, idx) => (
               <TouchableOpacity key={idx} onPress={() => navigation.navigate(item.screen)}>
@@ -221,7 +199,6 @@ export default function App() {
         </View>
       </ScrollView>
 
-<<<<<<< HEAD:Front-End/screens/Overview.jsx
       {/*bottom*/}
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 0, marginTop: 0 }}>
         <View
@@ -310,101 +287,12 @@ export default function App() {
           width: 45
         }}
         onPress={() => navigation.navigate("AddProduct")} // เปลี่ยนให้ไปยังหน้า AddProduct
-=======
-      <View
-        style={{
-          position: "absolute",
-          bottom: -200, // ขยับลงมาเพื่อให้โค้งลอยขึ้นมา
-          left: -160,
-          right: -160,
-          height: 300, // เพิ่มความสูงเพื่อให้ขอบบนโค้งขึ้น
-          backgroundColor: "#FFF",
-          borderTopLeftRadius: 900, // เพิ่มความโค้งมากขึ้น
-          borderTopRightRadius: 900,
-          overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: -3 },
-          shadowOpacity: 0.1,
-          shadowRadius: 15,
-          elevation: 15,
-          justifyContent: "center", // จัดกลางแนวตั้ง
-          alignItems: "center", // จัดกลางแนวนอน
-        }}
-      />
-
-      <View
-        style={{
-          flexDirection: "row",
-          width: "90%", // ลดความกว้างเพื่อให้ปุ่มอยู่ในกรอบ
-        }}
       >
-        {/* ปุ่ม icon 1 */}
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-            left: 30, // ห่างจากขอบซ้าย
-          }}
-          onPress={() => navigation.navigate("AllProduct")} // เพิ่มการนำทางเมื่อกด
-        >
-          <Image source={require("../assets/images/button1.png")} style={{ width: 25, height:25  }} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-            left: 110, // ห่างจากขอบซ้าย
-          }}
-          onPress={() => navigation.navigate("NearlyExpired")} // เพิ่มการนำทางเมื่อกด
-        >
-          <Image source={require("../assets/images/button2.png")} style={{ width: 30, height:30  }} />
-        </TouchableOpacity>
-
-
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-            left: 210, // ห่างจากขอบซ้าย
-          }}
-          onPress={() => navigation.navigate("Expired")} // เพิ่มการนำทางเมื่อกด
-        >
-          <Image source={require("../assets/images/button3.png")} style={{ width: 30, height:30  }} />
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-            left: 300, // ห่างจากขอบซ้าย
-          }}
-          onPress={() => navigation.navigate("Profile")} // เพิ่มการนำทางเมื่อกด
-        >
-          <Image source={require("../assets/images/button4.png")} style={{ width: 25, height:25 }} />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        style={{ position: "absolute", bottom: 75, alignSelf: "center", backgroundColor: "#6C74FF", borderRadius: 50, padding: 8 }}
-        onPress={() => setBottomSheetVisible(true)} // กดแล้วเปิด Bottom Sheet
->>>>>>> origin/bottomNew:screens/Overview.jsx
-      >
-        <Text style={{ fontSize: 35, fontWeight: 'normal', color: 'white', alignSelf: "center",bottom: 3}}> + </Text>
+        <Text style={{ fontSize: 35, fontWeight: 'normal', color: 'white', alignSelf: "center"}}> + </Text>
       </TouchableOpacity>
-<<<<<<< HEAD:Front-End/screens/Overview.jsx
-=======
-
-      {/* Bottom Sheet แสดงหน้า Add Product */}
-      <BottomSheet isVisible={isBottomSheetVisible}>
-        <View style={{ backgroundColor: "#fff", padding: 20, height: "90%" }}>
-          <AddProductScreen
-            onClose={() => setBottomSheetVisible(false)} // ส่ง prop ไปให้ปิดได้
-          />
-        </View>
-      </BottomSheet>
->>>>>>> origin/bottomNew:screens/Overview.jsx
     </View >
   );
 }
 
+import NearlyExpired from "./NearlyExpired";
+import Expired from "./Expired";
