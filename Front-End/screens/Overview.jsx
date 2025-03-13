@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from "react-native";
-import { Card, IconButton } from "react-native-paper";
-import { MaterialIcons } from "@expo/vector-icons";
+import { Card } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import { BottomSheet } from "react-native-elements";
+import NearlyExpired from "./NearlyExpired";
+import Expired from "./Expired";
 import AddProductScreen from "./AddProduct"; // นำเข้าหน้า Add Product
 
 // ตัวอย่างข้อมูลที่เก็บรายการอาหารในแต่ละประเภท
@@ -20,7 +20,6 @@ const storage = [
 
 export default function App() {
   const [currentDate, setCurrentDate] = useState("");
-  const [isBottomSheetVisible, setBottomSheetVisible] = useState(false);
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -294,5 +293,8 @@ export default function App() {
   );
 }
 
+<<<<<<< HEAD
 import NearlyExpired from "./NearlyExpired";
 import Expired from "./Expired";
+=======
+>>>>>>> 546e240bf325d3a5e42d069a5e00aeb0b80a6bfe
