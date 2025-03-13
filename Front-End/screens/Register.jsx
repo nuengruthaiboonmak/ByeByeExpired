@@ -1,7 +1,47 @@
-import React from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
 
 const RegisterScreen = ({ navigation }) => {
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const handleRegister = () => {
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Passwords do not match");
+      return;
+    }
+  
+    const userData = {
+      fullName: fullName,  // ส่ง fullName ไปด้วย
+      email: email,
+      password: password,
+      confirmPassword: confirmPassword,  // ส่ง confirmPassword ด้วย
+    };
+  
+    fetch('https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.message === "User registered successfully") {
+        Alert.alert("Success", "Registration successful!");
+        navigation.navigate("Login");
+      } else {
+        Alert.alert("Error", data.message || "An error occurred");
+      }
+    })
+    .catch((error) => {
+      console.error("Error during registration:", error);
+      Alert.alert("Error", "An error occurred. Please try again later.");
+    });
+  };
+
   return (
     <ImageBackground source={require("../assets/images/background.jpg")} style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Login")}>
@@ -10,14 +50,33 @@ const RegisterScreen = ({ navigation }) => {
       <View style={styles.formContainer}>
         <Text style={styles.headerText}>Create account</Text>
         <Text style={styles.label}>Full name</Text>
-        <TextInput style={styles.input} />
+        <TextInput
+          style={styles.input}
+          value={fullName}
+          onChangeText={setFullName}
+        />
         <Text style={styles.label}>Email address</Text>
-        <TextInput style={styles.input} keyboardType="email-address" />
+        <TextInput
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
         <Text style={styles.label}>Password</Text>
-        <TextInput style={styles.input} secureTextEntry />
+        <TextInput
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+        />
         <Text style={styles.label}>Confirm Password</Text>
-        <TextInput style={styles.input} secureTextEntry />
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Overview")}> 
+        <TextInput
+          style={styles.input}
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry
+        />
+        <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
       </View>
@@ -43,7 +102,6 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontSize: 14,
     color: "#6a367a", 
-   
   },
   formContainer: {
     width: "100%",
