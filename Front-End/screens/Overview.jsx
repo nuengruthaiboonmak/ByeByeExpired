@@ -292,9 +292,6 @@ export default function App() {
     </View >
   );
 }
-
-<<<<<<< HEAD
 import NearlyExpired from "./NearlyExpired";
 import Expired from "./Expired";
-=======
->>>>>>> 546e240bf325d3a5e42d069a5e00aeb0b80a6bfe
+
