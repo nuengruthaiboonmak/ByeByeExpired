@@ -1,19 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { 
   View, Text, Image, TouchableOpacity, 
-  StyleSheet, ImageBackground, Dimensions 
+  StyleSheet, ImageBackground, Dimensions, TextInput 
 } from "react-native";
 
-const { width } = Dimensions.get("window"); // ดึงขนาดหน้าจอเพื่อปรับภาพให้เหมาะสม
+// ดึงขนาดหน้าจอเพื่อปรับภาพให้เหมาะสม
+const { width } = Dimensions.get("window");
 
 const ProfileScreen = ({ navigation }) => {
-  return (
-    <ImageBackground source={require("../assets/images/background profile.png")} style={styles.background}>
-      
-      {/* ภาพพื้นหลังของโปรไฟล์ */}
-      <Image source={require("../assets/images/ground profile.png")} style={styles.profileBackground} />
+  const [name, setName] = useState("Ebola Coronana"); // ชื่อโปรไฟล์
+  const [isEditing, setIsEditing] = useState(false); // สถานะการแก้ไขชื่อ
 
-      {/* คำว่า My Profile พร้อมพื้นหลัง */}
+  // ฟังก์ชันสำหรับเปิด/ปิดโหมดแก้ไขชื่อ
+  const handleEditName = () => {
+    setIsEditing(!isEditing); // เปลี่ยนสถานะการแก้ไข
+  };
+
+  // ฟังก์ชันสำหรับการเปลี่ยนชื่อ
+  const handleChangeName = (newName) => {
+    setName(newName); // เปลี่ยนชื่อที่เก็บใน state
+  };
+
+  return (
+    <ImageBackground 
+      source={require("../assets/images/background profile.png")} 
+      style={styles.background}
+    >
+      {/* ภาพพื้นหลังของโปรไฟล์ */}
+      <Image 
+        source={require("../assets/images/ground profile.png")} 
+        style={styles.profileBackground} 
+      />
+
+      {/* หัวข้อ My Profile */}
       <View style={styles.myProfileContainer}>
         <Text style={styles.myProfileText}>My Profile</Text>
       </View>
@@ -23,13 +42,40 @@ const ProfileScreen = ({ navigation }) => {
         style={styles.topRightButton} 
         onPress={() => navigation.navigate("Overview")}
       >
-        <Image source={require("../assets/images/home.png")} style={styles.topRightIcon} />
+        <Image 
+          source={require("../assets/images/home.png")} 
+          style={styles.topRightIcon} 
+        />
       </TouchableOpacity>
 
-      {/* กรอบโปรไฟล์ */}
+      {/* ข้อมูลโปรไฟล์ */}
       <View style={styles.profileContainer}>
-        <Image source={require("../assets/images/profile11.png")} style={styles.profileImage} />
-        <Text style={styles.profileName}>Ebola Coronana</Text>
+        <Image 
+          source={require("../assets/images/profile11.png")} 
+          style={styles.profileImage} 
+        />
+        
+        {/* แสดงชื่อหรือ TextInput ขึ้นอยู่กับสถานะการแก้ไข */}
+        <View style={styles.nameContainer}>
+          {isEditing ? (
+            <TextInput
+              style={styles.profileName}
+              value={name}
+              onChangeText={handleChangeName}
+            />
+          ) : (
+            <Text style={styles.profileName}>{name}</Text>
+          )}
+          
+          {/* ลดพื้นที่ในการกดไอคอน */}
+          <TouchableOpacity onPress={handleEditName} style={styles.editButton}>
+            <Image 
+              source={require("../assets/images/Pen3.png")} // ใช้ไอคอนที่มีรูปดินสอ
+              style={styles.editIcon} 
+            />
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.profileEmail}>ebolacoronana@gmail.com</Text>
       </View>
 
@@ -40,7 +86,6 @@ const ProfileScreen = ({ navigation }) => {
       >
         <Text style={styles.buttonText}>Log Out</Text>
       </TouchableOpacity>
-      
     </ImageBackground>
   );
 };
@@ -67,7 +112,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 10,
-    
   },
   myProfileText: {
     fontSize: 16,
@@ -78,19 +122,19 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 40,
     right: 25,
-    width: 46,  
+    width: 46,
     height: 40,
     justifyContent: "center",
     alignItems: "center",
   },
   topRightIcon: {
-    width: 30,  
+    width: 30,
     height: 30,
     resizeMode: "contain",
   },
   profileContainer: {
     position: "absolute",
-    top: width * 0.20,
+    top: width * 0.2,
     width: "85%",
     alignItems: "center",
     padding: 20,
@@ -100,16 +144,31 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
   },
+  nameContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 16,
+  },
   profileName: {
     fontSize: 22,
+    left: 20,
     fontWeight: "bold",
     color: "#6D3B76",
-    marginTop: 10,
+  },
+  editButton: {
+    padding: -4, // ลดขนาดพื้นที่ในการกด
+  },
+  editIcon: {
+    left:25,
+    width: 22,
+    height: 20,
+    resizeMode: "contain",
   },
   profileEmail: {
     fontSize: 14,
+    left:9 ,
     color: "#666",
-    marginTop: 5,
+    marginTop: 6,
   },
   signOutButton: {
     position: "absolute",
