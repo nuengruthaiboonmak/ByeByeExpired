@@ -1,5 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image, TouchableWithoutFeedback, Keyboard } from "react-native";
+import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image , 
+  TouchableWithoutFeedback,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,} from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,6 +18,7 @@ const AddProductScreen = ({ navigation }) => {
   const [imageUri, setImageUri] = useState(null);
   const [userName, setUserName] = useState("");
   const [open, setOpen] = useState(false);
+  const [quantity, setQuantity] = useState("");
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -37,17 +42,24 @@ const AddProductScreen = ({ navigation }) => {
   };
 
   const saveProduct = () => {
-    if (!selectedStorage || !userName || !note) {
+    if (!selectedStorage || !userName || !note || !quantity) {
       Alert.alert("กรุณากรอกข้อมูลให้ครบถ้วน");
       return;
     }
+  
+    if (isNaN(quantity) || quantity <= 0) {
+      Alert.alert("กรุณาใส่จำนวนสินค้าให้ถูกต้อง");
+      return;
+    }
+  
     Alert.alert("ข้อมูลผลิตภัณฑ์ถูกบันทึกแล้ว", "", [
       {
         text: "OK",
-        onPress: () => navigation.goBack(),  // กลับไปหน้าก่อนหน้า
+        onPress: () => navigation.goBack(),
       },
     ]);
   };
+  
 
   const [showStorageDatePicker, setShowStorageDatePicker] = useState(false);
   const [showExpirationDatePicker, setShowExpirationDatePicker] = useState(false);
@@ -63,7 +75,11 @@ const AddProductScreen = ({ navigation }) => {
   };
 
   return (
-    
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
         {/* Gradient Background */}
         <LinearGradient
@@ -136,6 +152,15 @@ const AddProductScreen = ({ navigation }) => {
             <Text style={{ flex: 1 }}>{expirationDate.toLocaleDateString()}</Text>
             <Ionicons name="calendar-outline" size={20} color="gray" />
           </TouchableOpacity>
+          <Text style={styles.label}>Quantity</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter quantity"
+            value={quantity}
+            onChangeText={setQuantity}
+            keyboardType="numeric"
+            placeholderTextColor="#B0B0B0"
+          />
 
           <Text style={styles.label}>Note</Text>
           <TextInput
@@ -186,6 +211,8 @@ const AddProductScreen = ({ navigation }) => {
           </View>
         )}
       </View>
+      </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
   );
 };
 
@@ -275,7 +302,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
 
-  noteInput: { height: 100, textAlignVertical: "top" },
+  noteInput: { height: 80, textAlignVertical: "top" },
 
   dateTimePicker: {
     height: 100
