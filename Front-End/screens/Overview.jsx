@@ -5,6 +5,22 @@ import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
 import AddProductScreen from "./AddProduct"; // นำเข้าหน้า Add Product
 
+const nearlyExpiredData = [
+  { id: "1", name: "เอโร่ ไข่ไก่ เบอร์ 3", image: require("../assets/images/egg.png") },
+  { id: "2", name: "ลูกชิ้นปลากลม", image: require("../assets/images/egg.png") },
+  { id: "3", name: "น้ำมะนาวคั้นสด", image: require("../assets/images/egg.png") },
+  { id: "4", name: "ไก่หมักกล้วยแช่แข็ง", image: require("../assets/images/egg.png") },
+  { id: "5", name: "เลือดไก่", image: require("../assets/images/egg.png") },
+];
+
+const expiredData = [
+  { id: "1", name: "เครื่องในไก่", image: require("../assets/images/egg.png") },
+  { id: "2", name: "เลือดไก่", image: require("../assets/images/egg.png") },
+  { id: "3", name: "ไก่หมักกล้วยแช่แข็ง", image: require("../assets/images/egg.png") },
+  { id: "4", name: "น้ำมะนาวคั้นสด", image: require("../assets/images/egg.png") },
+  { id: "5", name: "ลูกชิ้นปลากลม", image: require("../assets/images/egg.png") },
+];
+
 // ตัวอย่างข้อมูลที่เก็บรายการอาหารในแต่ละประเภท
 const fridgeItems = ["Cheese", "Butter", "Yogurt"];
 const freezerItems = ["Ice cream", "Frozen peas", "Frozen pizza"];
@@ -16,14 +32,21 @@ const storage = [
   { name: "Dry food", count: dryFoodItems.length, image: require("../assets/images/dryFood.png"), screen: "StorageDryFood" },
 ];
 
+
 export default function App() {
   const [currentDate, setCurrentDate] = useState("");
   const navigation = useNavigation();
+  const [nearlyExpired, setNearlyExpired] = useState([]);  // กำหนด useState ที่นี่
+  const [expired, setExpired] = useState([]);  // กำหนด useState ที่นี่
+
 
   useEffect(() => {
     const date = new Date();
     const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
     setCurrentDate(formattedDate);
+    setNearlyExpired(nearlyExpiredData.slice(0, 5));
+    setExpired(expiredData.slice(0, 5));
+
   }, []);
 
   return (
@@ -107,8 +130,18 @@ export default function App() {
             </View>
           </LinearGradient>
           <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 120, elevation: 5 }}>
-            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-              <NearlyExpired limit={5} />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {nearlyExpired.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  onPress={() => navigation.navigate("NearlyExpired", { productId: item.id })} // เพิ่มการนำทางที่นี่
+                >
+                  <View key={item.id} style={{ backgroundColor: "#FFEBEB", borderRadius: 10, padding: 15, marginRight: 10, width: 90, height: 90, justifyContent: "center", alignItems: "center" }}>
+                    <Image source={item.image} style={{ width: 50, height: 50, marginTop: 10 }} />
+                    <Text style={{ fontSize: 10, color: "#7C0A0A", textAlign: "center", marginBottom: 10 }}>{item.name}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </ScrollView>
           </View>
         </View>
@@ -122,8 +155,18 @@ export default function App() {
             </View>
           </LinearGradient>
           <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 120, elevation: 5 }}>
-            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
-              <Expired />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              {expired.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  onPress={() => navigation.navigate("Expired", { productId: item.id })} // เพิ่มการนำทางที่นี่
+                >
+                  <View key={item.id} style={{ backgroundColor: "#FFEBEB", borderRadius: 10, padding: 15, marginRight: 10, width: 90, height: 90, justifyContent: "center", alignItems: "center" }}>
+                    <Image source={item.image} style={{ width: 50, height: 50, marginTop: 10 }} />
+                    <Text style={{ fontSize: 10, color: "#7C0A0A", textAlign: "center", marginBottom: 10 }}>{item.name}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </ScrollView>
           </View>
 
@@ -236,23 +279,25 @@ export default function App() {
         </View>
 
       </View>
-      <TouchableOpacity
-        style={{
-          position: "absolute",
-          bottom: 60, // ระยะห่างจากด้านล่าง
-          alignSelf: "center", // จัดปุ่มให้อยู่กลางแนวนอน
-          backgroundColor: "#6C74FF", // สีของปุ่ม
-          borderRadius: 50, // ทำให้เป็นวงกลม
-          padding: 4, // ลดความห่างภายในให้เล็กลง
-          height: 45, // กำหนดความสูงให้เล็กลง
-          width: 45, // กำหนดความกว้างให้เล็กลง
-          justifyContent: "center", // จัดตำแหน่งเนื้อหากลางแนวตั้ง
-          alignItems: "center", // จัดตำแหน่งเนื้อหากลางแนวนอน
-        }}
-        onPress={() => navigation.navigate("AddProduct")} // นำทางไปหน้าที่ต้องการ
-      >
-        <Text style={{ fontSize: 28, fontWeight: 'normal', color: 'white' }}>+</Text>
-      </TouchableOpacity>
+      <View>
+        <TouchableOpacity
+          style={{
+            position: "absolute",
+            bottom: 40, // ระยะห่างจากด้านล่าง
+            alignSelf: "center", // จัดปุ่มให้อยู่กลางแนวนอน
+            backgroundColor: "#6C74FF", // สีของปุ่ม
+            borderRadius: 50, // ทำให้เป็นวงกลม
+            padding: 4, // ลดความห่างภายในให้เล็กลง
+            height: 45, // กำหนดความสูงให้เล็กลง
+            width: 45, // กำหนดความกว้างให้เล็กลง
+            justifyContent: "center", // จัดตำแหน่งเนื้อหากลางแนวตั้ง
+            alignItems: "center", // จัดตำแหน่งเนื้อหากลางแนวนอน
+          }}
+          onPress={() => navigation.navigate("AddProduct")} // นำทางไปหน้าที่ต้องการ
+        >
+          <Text style={{ fontSize: 28, fontWeight: 'normal', color: 'white', textAlign: "center" }}>+</Text>
+        </TouchableOpacity>
+      </View>
     </View >
   );
 }
