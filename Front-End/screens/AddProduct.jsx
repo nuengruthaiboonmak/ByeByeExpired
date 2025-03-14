@@ -32,9 +32,11 @@ const AddProductScreen = ({ navigation }) => {
   
     if (!result.canceled) {
       setImageUri(result.assets[0].uri);  // แสดงตัวอย่างรูปที่เลือก
+      console.log("Image URI: ", result.assets[0].uri);  // เพิ่มการตรวจสอบ URL ของภาพ
       uploadImage(result.assets[0].uri);  // อัปโหลดรูป
     }
   };
+  
 
   const uploadImage = async (uri) => {
     let formData = new FormData();
@@ -49,17 +51,21 @@ const AddProductScreen = ({ navigation }) => {
     });
   
     try {
-      let response = await axios.post("https://sturdy-space-goggles-pj7p6j47w79q294p9-5001.app.github.dev/upload", formData, {
+      let response = await axios.post("https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
   
       if (response.data.file_url) {
+        console.log("Image uploaded successfully:", response.data.file_url);  // ดู URL ที่ได้รับ
         setImageUri(response.data.file_url); // ตั้งค่าลิงก์รูปที่อัปโหลดแล้ว
+      } else {
+        console.log("No file_url received from server");
       }
     } catch (error) {
       console.error("Upload error:", error);
     }
-  };
+};
+
   
   const onChangeStorageDate = (event, selectedDate) => {
     const currentDate = selectedDate || storageDate;
@@ -71,9 +77,15 @@ const AddProductScreen = ({ navigation }) => {
     setExpirationDate(currentDate);
   };
 
-  const saveProduct = () => {
-    if (!selectedStorage || !userName || !note || !quantity) {
+  const saveProduct = async () => {
+    // ตรวจสอบว่าได้กรอกข้อมูลครบถ้วนหรือไม่
+    if (!selectedStorage || !userName || !quantity || !imageUri) {
       Alert.alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
+  
+    if (!imageUri) {
+      Alert.alert("กรุณาอัปโหลดรูปภาพ");
       return;
     }
   
@@ -82,15 +94,36 @@ const AddProductScreen = ({ navigation }) => {
       return;
     }
   
-    Alert.alert("ข้อมูลผลิตภัณฑ์ถูกบันทึกแล้ว", "", [
-      {
-        text: "OK",
-        onPress: () => navigation.goBack(),
-      },
-    ]);
-  };
+    // ข้อมูลผลิตภัณฑ์ที่กรอกมา
+    const productData = {
+      name: userName,
+      storage: selectedStorage,
+      storage_date: storageDate.toISOString().split('T')[0],  // ส่งเฉพาะวันที่ (YYYY-MM-DD)
+      expiration_date: expirationDate.toISOString().split('T')[0],  // ส่งเฉพาะวันที่ (YYYY-MM-DD)
+      quantity: parseInt(quantity),
+      note: note,
+      user_id: user_id,
+      photo: imageUri,
+    };
   
-
+    try {
+      const response = await axios.post("https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/add_item", productData);
+      if (response.status === 201) {
+        Alert.alert("ข้อมูลผลิตภัณฑ์ถูกบันทึกแล้ว", "", [
+          {
+            text: "OK",
+            onPress: () => navigation.goBack(),
+          },
+        ]);
+      } else {
+        Alert.alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+      }
+    } catch (error) {
+      console.error("Error saving product:", error);
+      Alert.alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
+    }
+  };  
+  
   const [showStorageDatePicker, setShowStorageDatePicker] = useState(false);
   const [showExpirationDatePicker, setShowExpirationDatePicker] = useState(false);
 
@@ -133,9 +166,9 @@ const AddProductScreen = ({ navigation }) => {
           <View style={styles.imagePlaceholder}>
             {imageUri ? (
               <Image source={{ uri: imageUri }} style={styles.imagePreview} />
-            ) : (
-              <Text style={styles.imagePlaceholderText}>Tap to add image</Text>
-            )}
+          ) : (
+            <Text style={styles.imagePlaceholderText}>Tap to add image</Text>
+           )}
           </View>
         </TouchableOpacity>
         
