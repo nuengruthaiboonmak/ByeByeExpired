@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useEffect } from 'react';
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image , 
   TouchableWithoutFeedback,
   Keyboard,
@@ -10,7 +11,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import * as ImagePicker from "expo-image-picker";
 import FormData from "form-data";  // ใช้ FormData ส่งไฟล์ไปเซิร์ฟเวอร์
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from "@react-native-community/datetimepicker";
 
 const AddProductScreen = ({ navigation }) => {
@@ -22,7 +23,20 @@ const AddProductScreen = ({ navigation }) => {
   const [userName, setUserName] = useState("");
   const [open, setOpen] = useState(false);
   const [quantity, setQuantity] = useState("");
+  const [userId, setUserId] = useState(null);
 
+  useEffect(() => {
+    const checkUserID = async () => {
+      const storedUserId = await AsyncStorage.getItem("user_id");
+      if (storedUserId) {
+        setUserId(storedUserId);
+      } else {
+        Alert.alert("เกิดข้อผิดพลาด", "ไม่พบข้อมูลผู้ใช้");
+      }
+    };
+    checkUserID();
+  }, []);
+  
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -37,7 +51,6 @@ const AddProductScreen = ({ navigation }) => {
     }
   };
   
-
   const uploadImage = async (uri) => {
     let formData = new FormData();
     let filename = uri.split("/").pop();  // ดึงชื่อไฟล์
@@ -65,7 +78,6 @@ const AddProductScreen = ({ navigation }) => {
       console.error("Upload error:", error);
     }
 };
-
   
   const onChangeStorageDate = (event, selectedDate) => {
     const currentDate = selectedDate || storageDate;
@@ -98,16 +110,27 @@ const AddProductScreen = ({ navigation }) => {
     const productData = {
       name: userName,
       storage: selectedStorage,
-      storage_date: storageDate.toISOString().split('T')[0],  // ส่งเฉพาะวันที่ (YYYY-MM-DD)
-      expiration_date: expirationDate.toISOString().split('T')[0],  // ส่งเฉพาะวันที่ (YYYY-MM-DD)
+      storage_date: storageDate.toISOString().split('T')[0],
+      expiration_date: expirationDate.toISOString().split('T')[0],
       quantity: parseInt(quantity),
       note: note,
-      user_id: user_id,
+      user_id: userId, // ใช้ค่าจาก state
       photo: imageUri,
     };
   
     try {
-      const response = await axios.post("https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/add_item", productData);
+      const response = await axios.post(
+        "https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/add_item",
+        productData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      
+      console.log("Response:", response.data); // เพิ่ม Log ตรวจสอบ
+
       if (response.status === 201) {
         Alert.alert("ข้อมูลผลิตภัณฑ์ถูกบันทึกแล้ว", "", [
           {
@@ -123,7 +146,13 @@ const AddProductScreen = ({ navigation }) => {
       Alert.alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
   };  
-  
+  useEffect(() => {
+    const checkUserID = async () => {
+      const userId = await AsyncStorage.getItem('user_id');
+      console.log("Stored user_id:", userId);
+    };
+    checkUserID();
+  }, []);
   const [showStorageDatePicker, setShowStorageDatePicker] = useState(false);
   const [showExpirationDatePicker, setShowExpirationDatePicker] = useState(false);
 

@@ -1,57 +1,50 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Please fill in both fields");
       return;
     }
-
-    // เชื่อมต่อกับ Backend เพื่อตรวจสอบข้อมูล
-    const loginData = {
-      email: email,
-      password: password,
-    };
-
-    fetch('https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/login', {  // เปลี่ยน URL ให้ถูกต้อง
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(loginData),
-    })
-    .then((response) => response.json())
-    .then((data) => {
+  
+    const loginData = { email, password };
+  
+    try {
+      const response = await fetch('https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(loginData),
+      });
+  
+      const data = await response.json();
+  
       if (data.message === "Login successful") {
-        // ถ้าล็อกอินสำเร็จ นำผู้ใช้ไปที่หน้า Overview
+        if (data.user_id) {
+          await AsyncStorage.setItem("user_id", data.user_id.toString()); // ✅ เก็บ user_id ไว้ใน AsyncStorage
+        }
+  
         Alert.alert("Success", "Login successful!");
         navigation.navigate("Overview");
+  
       } else {
-        // ถ้าล็อกอินไม่สำเร็จ ให้แสดงข้อความผิดพลาดและเพิ่มปุ่ม "Create an account"
         Alert.alert(
           "Error",
           "Invalid email or password. Please try again.",
           [
-            {
-              text: "Try Again",
-              onPress: () => console.log("Try Again Pressed")
-            },
-            {
-              text: "Create an account",
-              onPress: () => navigation.navigate("Register")
-            }
+            { text: "Try Again", onPress: () => console.log("Try Again Pressed") },
+            { text: "Create an account", onPress: () => navigation.navigate("Register") }
           ]
         );
       }
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error("Error during login:", error);
       Alert.alert("Error", "An error occurred. Please try again later.");
-    });
+    }
   };
 
   return (

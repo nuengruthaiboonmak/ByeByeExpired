@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
@@ -7,7 +8,7 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     // ตรวจสอบข้อมูลที่กรอก
     if (!fullName || !email || !password || !confirmPassword) {
       Alert.alert("Error", "Please fill in all fields");
@@ -34,18 +35,31 @@ const RegisterScreen = ({ navigation }) => {
     };
   
     // เชื่อมกับ Backend เพื่อตรวจสอบว่าอีเมลซ้ำหรือไม่
-    fetch('https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/register', {  // แก้ไข URL ที่ถูกต้องของคุณที่นี้
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    })
-    .then((response) => response.json())
-    .then((data) => {
+    try {
+      const response = await fetch('https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userData),
+      });
+  
+      const data = await response.json();
+      console.log(data);
+
       if (data.message === "User registered successfully") {
-        Alert.alert("Success", "Registration successful!");
-        navigation.navigate("Login");  // ย้ายไปที่หน้าล็อกอิน
+        if (data.id !== undefined && data.id !== null) {
+          await AsyncStorage.setItem("user_id", data.id.toString()); // ✅ เก็บ user_id
+      
+          // ✅ แสดง user_id หลังสมัครสำเร็จ
+          Alert.alert(
+            "Success",
+            `Registration successful!\nYour User ID: ${data.id}`,
+            [{ text: "OK", onPress: () => navigation.navigate("Login") }]
+          );
+        } else {
+          Alert.alert("Success", "Registration successful, but no user_id returned!");
+          navigation.navigate("Login");
+        }
+  
       } else if (data.message === "Email already exists") {
         Alert.alert(
           "Error",
@@ -54,28 +68,23 @@ const RegisterScreen = ({ navigation }) => {
             {
               text: "Try Again",
               onPress: () => {
-                // ล้างข้อมูลที่กรอกทั้งหมด
                 setFullName('');
                 setEmail('');
                 setPassword('');
                 setConfirmPassword('');
               },
             },
-            {
-              text: "Login",
-              onPress: () => navigation.navigate("Login"),
-            },
+            { text: "Login", onPress: () => navigation.navigate("Login") },
           ],
           { cancelable: false }
         );
       } else {
         Alert.alert("Error", data.message || "An error occurred");
       }
-    })
-    .catch((error) => {
+    } catch (error) {
       console.error("Error during registration:", error);
       Alert.alert("Error", "An error occurred. Please try again later.");
-    });
+    }
   };
 
   return (
