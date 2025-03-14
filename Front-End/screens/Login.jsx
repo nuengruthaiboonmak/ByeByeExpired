@@ -1,11 +1,55 @@
-import React from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
 
 const LoginScreen = ({ navigation }) => {
+  // ใช้ useState เพื่อจัดการค่าของอีเมลและรหัสผ่าน
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // ฟังก์ชันเพื่อจัดการการเข้าสู่ระบบ
+  const handleLogin = async () => {
+    // ตรวจสอบว่าอีเมลและรหัสผ่านถูกกรอกหรือยัง
+    if (!email || !password) {
+      Alert.alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+      return;
+    }
+
+    // สร้างข้อมูลสำหรับส่งไปที่ API
+    const loginData = {
+      email: email,
+      password: password,
+    };
+
+    try {
+      // ส่งข้อมูลเข้าสู่ระบบไปยัง API
+      const response = await fetch("https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      const data = await response.json();
+
+      if (response.status === 200) {
+        // หากเข้าสู่ระบบสำเร็จ นำทางไปที่หน้า Overview
+        navigation.navigate("Overview", { items: data.items });
+      } else {
+        // หากเกิดข้อผิดพลาดแสดงข้อความ
+        const errorMessage = data.message || "เกิดข้อผิดพลาดในการเข้าสู่ระบบ";
+        Alert.alert(errorMessage);
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      Alert.alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
+    }
+  };
+
   return (
     <ImageBackground source={require("../assets/images/background.jpg")} style={styles.container}>
       <Text style={styles.firstSubtitle}>
-        <Text style={{ fontWeight: "bold",color: "#6c9de8"}}>Never waste food again! </Text>
+        <Text style={{ fontWeight: "bold", color: "#6c9de8" }}>Never waste food again! </Text>
         Our app reminds you of expiration dates and helps you manage your food,
         ensuring you use your ingredients before they go bad!
       </Text>
@@ -13,16 +57,26 @@ const LoginScreen = ({ navigation }) => {
       <Text style={styles.title}>Log In</Text>
       <View style={styles.formContainer}>
         <Text style={styles.label}>Email address</Text>
-        <TextInput style={styles.input} keyboardType="email-address" />
+        <TextInput
+          style={styles.input}
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail} // อัปเดตค่าของอีเมลเมื่อผู้ใช้พิมพ์
+        />
         <Text style={styles.label}>Password</Text>
-        <TextInput style={styles.input} secureTextEntry />
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Overview")}>
+        <TextInput
+          style={styles.input}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword} // อัปเดตค่าของรหัสผ่านเมื่อผู้ใช้พิมพ์
+        />
+        <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Log In</Text>
         </TouchableOpacity>
         <Text style={styles.footerText}>
           Don’t have an account yet?{" "}
-          <Text 
-            style={styles.signUpText} 
+          <Text
+            style={styles.signUpText}
             onPress={() => navigation.navigate("Register")}
           >
             Create an account
@@ -31,7 +85,7 @@ const LoginScreen = ({ navigation }) => {
       </View>
     </ImageBackground>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -107,4 +161,3 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
-
