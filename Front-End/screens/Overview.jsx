@@ -3,8 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet } from "rea
 import { Card } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import { LinearGradient } from "expo-linear-gradient";
-import NearlyExpired from "./NearlyExpired";
-import Expired from "./Expired";
 import AddProductScreen from "./AddProduct"; // นำเข้าหน้า Add Product
 
 // ตัวอย่างข้อมูลที่เก็บรายการอาหารในแต่ละประเภท
@@ -100,51 +98,31 @@ export default function App() {
       </View>
 
       <ScrollView>
+        {/* Nearly Expired Section */}
         <View style={{ marginVertical: 10, marginTop: 30 }}>
-          <LinearGradient
-            colors={["#FEC2D6", "#FEE5E1"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{ padding: 8, borderRadius: 30 }}
-          >
+          <LinearGradient colors={["#FEC2D6", "#FEE5E1"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ padding: 8, borderRadius: 30 }}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image
-                source={require("../assets/images/N.png")}
-                style={{ width: 25, height: 25, marginRight: 8 }}
-              />
-              <Text style={{ fontWeight: "bold", fontSize: 16, color: "#E72828" }}>
-                Nearly expired
-              </Text>
+              <Image source={require("../assets/images/N.png")} style={{ width: 25, height: 25, marginRight: 8 }} />
+              <Text style={{ fontWeight: "bold", fontSize: 16, color: "#E72828" }}>Nearly expired</Text>
             </View>
           </LinearGradient>
-
-          <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 110, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 5 }}>
-            <ScrollView horizontal>
-              <NearlyExpired />
+          <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 120, elevation: 5 }}>
+            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
+              <NearlyExpired limit={5} />
             </ScrollView>
           </View>
         </View>
 
+        {/* Expired Section */}
         <View style={{ marginVertical: 10, marginTop: 20 }}>
-          <LinearGradient
-            colors={["#EBDC9E", "#FFF2D6"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={{ padding: 8, borderRadius: 30 }}
-          >
+          <LinearGradient colors={["#EBDC9E", "#FFF2D6"]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }} style={{ padding: 8, borderRadius: 30 }}>
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Image
-                source={require("../assets/images/E.png")}
-                style={{ width: 25, height: 25, marginRight: 8 }}
-              />
-              <Text style={{ fontWeight: "bold", fontSize: 16, color: "#7C0A0A" }}>
-                Expired
-              </Text>
+              <Image source={require("../assets/images/E.png")} style={{ width: 25, height: 25, marginRight: 8 }} />
+              <Text style={{ fontWeight: "bold", fontSize: 16, color: "#7C0A0A" }}>Expired</Text>
             </View>
           </LinearGradient>
-
-          <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 110, shadowColor: "#000", shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 5 }}>
-            <ScrollView horizontal>
+          <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 120, elevation: 5 }}>
+            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
               <Expired />
             </ScrollView>
           </View>
@@ -203,7 +181,7 @@ export default function App() {
         <View
           style={{
             position: "absolute",
-            bottom: -280, // ขยับลงมาเพื่อให้โค้งลอยขึ้นมา
+            bottom: -290, // ขยับลงมาเพื่อให้โค้งลอยขึ้นมา
             left: -210,
             right: -210,
             height: 350, // เพิ่มความสูงเพื่อให้ขอบบนโค้งขึ้น
@@ -223,75 +201,60 @@ export default function App() {
 
         <View
           style={{
-            flexDirection: "row",
-            width: "90%", // ลดความกว้างเพื่อให้ปุ่มอยู่ในกรอบ
+            position: "absolute",
+            bottom: 0, // ตั้งตำแหน่งที่ด้านล่างของหน้าจอ
+            width: "100%", // ทำให้ครอบคลุมพื้นที่ทั้งหมด
+            flexDirection: "row", // จัดปุ่มในแนวนอน
+            justifyContent: "space-evenly", // ให้ปุ่มห่างกันเท่ากัน
+            paddingHorizontal: 0, // เพิ่มระยะห่างจากขอบซ้ายและขวา
+            alignItems: "center", // จัดปุ่มให้อยู่กลางแนวตั้ง
           }}
         >
-
           <TouchableOpacity
-            style={{
-              position: "absolute",
-              bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-              left: 30, // ห่างจากขอบซ้าย
-            }}
-            onPress={() => navigation.navigate("AllProduct")} // เพิ่มการนำทางเมื่อกด
+            onPress={() => navigation.navigate("AllProduct")}
           >
             <Image source={require("../assets/images/button1.png")} style={{ width: 22, height: 22 }} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={{
-              position: "absolute",
-              bottom: 8, // ตั้งปุ่มให้ห่างจากขอบล่าง
-              left: 110, // ห่างจากขอบซ้าย
-            }}
-            onPress={() => navigation.navigate("NearlyExpired")} // เพิ่มการนำทางเมื่อกด
+            onPress={() => navigation.navigate("NearlyExpired")}
           >
             <Image source={require("../assets/images/button2.png")} style={{ width: 27, height: 27 }} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={{
-              position: "absolute",
-              bottom: 8, // ตั้งปุ่มให้ห่างจากขอบล่าง
-              left: 210, // ห่างจากขอบซ้าย
-            }}
-            onPress={() => navigation.navigate("Expired")} // เพิ่มการนำทางเมื่อกด
+            onPress={() => navigation.navigate("Expired")}
           >
             <Image source={require("../assets/images/button3.png")} style={{ width: 27, height: 27 }} />
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={{
-              position: "absolute",
-              bottom: 10, // ตั้งปุ่มให้ห่างจากขอบล่าง
-              left: 300, // ห่างจากขอบซ้าย
-            }}
-            onPress={() => navigation.navigate("Profile")} // เพิ่มการนำทางเมื่อกด
+            onPress={() => navigation.navigate("Profile")}
           >
             <Image source={require("../assets/images/button4.png")} style={{ width: 22, height: 22 }} />
           </TouchableOpacity>
         </View>
-      </View>
 
+      </View>
       <TouchableOpacity
         style={{
           position: "absolute",
-          bottom: 65,
-          alignSelf: "center",
-          backgroundColor: "#6C74FF",
-          borderRadius: 100,
-          padding: 2,
-          height: 45,
-          width: 45
+          bottom: 60, // ระยะห่างจากด้านล่าง
+          alignSelf: "center", // จัดปุ่มให้อยู่กลางแนวนอน
+          backgroundColor: "#6C74FF", // สีของปุ่ม
+          borderRadius: 50, // ทำให้เป็นวงกลม
+          padding: 4, // ลดความห่างภายในให้เล็กลง
+          height: 45, // กำหนดความสูงให้เล็กลง
+          width: 45, // กำหนดความกว้างให้เล็กลง
+          justifyContent: "center", // จัดตำแหน่งเนื้อหากลางแนวตั้ง
+          alignItems: "center", // จัดตำแหน่งเนื้อหากลางแนวนอน
         }}
-        onPress={() => navigation.navigate("AddProduct")} // เปลี่ยนให้ไปยังหน้า AddProduct
+        onPress={() => navigation.navigate("AddProduct")} // นำทางไปหน้าที่ต้องการ
       >
-        <Text style={{ fontSize: 35, fontWeight: 'normal', color: 'white', alignSelf: "center"}}> + </Text>
+        <Text style={{ fontSize: 28, fontWeight: 'normal', color: 'white' }}>+</Text>
       </TouchableOpacity>
     </View >
   );
 }
 import NearlyExpired from "./NearlyExpired";
 import Expired from "./Expired";
-
