@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { useEffect } from 'react';
+import React, { useState , useEffect} from "react";
 import { View, Text, TouchableOpacity, TextInput, StyleSheet, Alert, Image , 
   TouchableWithoutFeedback,
   Keyboard,
@@ -13,6 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 import FormData from "form-data";  // ใช้ FormData ส่งไฟล์ไปเซิร์ฟเวอร์
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { getUserID } from '../utils/storage';
 
 const AddProductScreen = ({ navigation }) => {
   const [selectedStorage, setSelectedStorage] = useState(null);
@@ -27,13 +27,18 @@ const AddProductScreen = ({ navigation }) => {
 
   useEffect(() => {
     const checkUserID = async () => {
-      const storedUserId = await AsyncStorage.getItem("user_id");
-      if (storedUserId) {
-        setUserId(storedUserId);
-      } else {
-        Alert.alert("เกิดข้อผิดพลาด", "ไม่พบข้อมูลผู้ใช้");
+      try {
+        const storedUserId = await getUserID();
+        if (storedUserId) {
+          setUserId(storedUserId);  // กำหนดค่า user_id ลงใน state
+        } else {
+          Alert.alert("User not logged in", "Please log in to continue");
+        }
+      } catch (error) {
+        console.error("Error fetching user_id:", error);
       }
     };
+    
     checkUserID();
   }, []);
   
@@ -44,10 +49,12 @@ const AddProductScreen = ({ navigation }) => {
       quality: 1,
     });
   
-    if (!result.canceled) {
+    if (!result.canceled && result.assets[0].uri) {
       setImageUri(result.assets[0].uri);  // แสดงตัวอย่างรูปที่เลือก
       console.log("Image URI: ", result.assets[0].uri);  // เพิ่มการตรวจสอบ URL ของภาพ
       uploadImage(result.assets[0].uri);  // อัปโหลดรูป
+    } else {
+      Alert.alert("กรุณาเลือกภาพ");
     }
   };
   
@@ -90,6 +97,14 @@ const AddProductScreen = ({ navigation }) => {
   };
 
   const saveProduct = async () => {
+    // ตรวจสอบว่า user_id ถูกตั้งค่าแล้วหรือไม่
+    if (!userId) {
+      Alert.alert("ไม่พบข้อมูลผู้ใช้");
+      return;
+    }
+  
+    console.log("📌 _id ก่อนส่งไป API:", userId); // ✅ ตรวจสอบก่อนส่ง
+    
     // ตรวจสอบว่าได้กรอกข้อมูลครบถ้วนหรือไม่
     if (!selectedStorage || !userName || !quantity || !imageUri) {
       Alert.alert("กรุณากรอกข้อมูลให้ครบถ้วน");
@@ -114,7 +129,7 @@ const AddProductScreen = ({ navigation }) => {
       expiration_date: expirationDate.toISOString().split('T')[0],
       quantity: parseInt(quantity),
       note: note,
-      user_id: userId, // ใช้ค่าจาก state
+      user_id: userId,  // ใช้ _id ที่เก็บใน state
       photo: imageUri,
     };
   
@@ -128,9 +143,9 @@ const AddProductScreen = ({ navigation }) => {
           },
         }
       );
-      
+  
       console.log("Response:", response.data); // เพิ่ม Log ตรวจสอบ
-
+  
       if (response.status === 201) {
         Alert.alert("ข้อมูลผลิตภัณฑ์ถูกบันทึกแล้ว", "", [
           {
@@ -145,14 +160,8 @@ const AddProductScreen = ({ navigation }) => {
       console.error("Error saving product:", error);
       Alert.alert("เกิดข้อผิดพลาดในการบันทึกข้อมูล");
     }
-  };  
-  useEffect(() => {
-    const checkUserID = async () => {
-      const userId = await AsyncStorage.getItem('user_id');
-      console.log("Stored user_id:", userId);
-    };
-    checkUserID();
-  }, []);
+  };
+
   const [showStorageDatePicker, setShowStorageDatePicker] = useState(false);
   const [showExpirationDatePicker, setShowExpirationDatePicker] = useState(false);
 
@@ -272,6 +281,7 @@ const AddProductScreen = ({ navigation }) => {
               value={storageDate}
               mode="date"
               display="spinner"
+              textColor="black"
               onChange={onChangeStorageDate}
               style={styles.dateTimePicker}
             />
@@ -291,6 +301,7 @@ const AddProductScreen = ({ navigation }) => {
               value={expirationDate}
               mode="date"
               display="spinner"
+              textColor="black"
               onChange={onChangeExpirationDate}
               style={[styles.dateTimePicker, { height: 150 }]}
             />

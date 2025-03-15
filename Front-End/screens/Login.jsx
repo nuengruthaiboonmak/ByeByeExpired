@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setUserID } from '../utils/storage';  // ตรวจสอบเส้นทางให้ถูกต้อง
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -21,16 +22,36 @@ const LoginScreen = ({ navigation }) => {
         body: JSON.stringify(loginData),
       });
   
+      // เช็คว่า response.ok เป็น true หรือไม่
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        console.log("Error Response:", errorMessage);
+        Alert.alert("Error", `Login failed: ${errorMessage}`);
+        return;
+      }
+  
       const data = await response.json();
   
-      if (data.message === "Login successful") {
-        if (data.user_id) {
-          await AsyncStorage.setItem("user_id", data.user_id.toString()); // ✅ เก็บ user_id ไว้ใน AsyncStorage
+      // Debugging Logs
+      console.log("Response data:", data);
+      console.log("User Object:", data.user); // เช็ค user object
+  
+      // ตรวจสอบว่า login สำเร็จ
+      if (data.message === "Login successful" && data.user) {
+        const userId = data.user._id; // ใช้ _id แทน id
+  
+        if (userId) {
+          // บันทึก user_id ลงใน AsyncStorage
+          await setUserID(userId)
+          console.log("Logged in _id:", userId);
+          
+          // แจ้งเตือนและนำทางไปยังหน้าต่อไป
+          Alert.alert("Success", `Login successful! Your User ID: ${userId}`);
+          navigation.navigate("Overview");
+        } else {
+          console.log("No _id received from the server.");
+          Alert.alert("Error", "No user ID received. Please try again.");
         }
-  
-        Alert.alert("Success", "Login successful!");
-        navigation.navigate("Overview");
-  
       } else {
         Alert.alert(
           "Error",

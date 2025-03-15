@@ -43,23 +43,15 @@ const RegisterScreen = ({ navigation }) => {
       });
   
       const data = await response.json();
-      console.log(data);
-
-      if (data.message === "User registered successfully") {
-        if (data.id !== undefined && data.id !== null) {
-          await AsyncStorage.setItem("user_id", data.id.toString()); // ✅ เก็บ user_id
-      
-          // ✅ แสดง user_id หลังสมัครสำเร็จ
-          Alert.alert(
-            "Success",
-            `Registration successful!\nYour User ID: ${data.id}`,
-            [{ text: "OK", onPress: () => navigation.navigate("Login") }]
-          );
-        } else {
-          Alert.alert("Success", "Registration successful, but no user_id returned!");
-          navigation.navigate("Login");
-        }
   
+      if (data.message === "User registered successfully") {
+        // เช็คว่าได้รับ user_id หรือไม่
+        if (data.user_id) {
+          // แปลง user_id เป็น integer และเก็บใน AsyncStorage
+          await AsyncStorage.setItem("user_id", data.user_id.toString()); // เก็บเป็น string แต่เป็นตัวเลขที่แปลงมา
+        }
+        Alert.alert("Success", "Registration successful!");
+        navigation.navigate("Login");
       } else if (data.message === "Email already exists") {
         Alert.alert(
           "Error",
