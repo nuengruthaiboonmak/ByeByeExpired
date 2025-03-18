@@ -1,6 +1,7 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert,KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Platform } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { setUserID } from '../utils/storage';  // ตรวจสอบเส้นทางให้ถูกต้อง
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -21,25 +22,32 @@ const LoginScreen = ({ navigation }) => {
         body: JSON.stringify(loginData),
       });
   
+      if (!response.ok) {
+        const errorMessage = await response.text();
+        console.log("Error Response:", errorMessage);
+        Alert.alert("Error", `Login failed: ${errorMessage}`);
+        return;
+      }
+  
       const data = await response.json();
   
-      if (data.message === "Login successful") {
-        if (data.user_id) {
-          await AsyncStorage.setItem("user_id", data.user_id.toString()); // ✅ เก็บ user_id ไว้ใน AsyncStorage
+      console.log("Response data:", data);
+      console.log("User Object:", data.user);
+  
+      if (data.message === "Login successful" && data.user) {
+        const userId = data.user.user_id;
+  
+        if (userId) {
+          await AsyncStorage.setItem('user_id', userId.toString());
+          console.log("Logged in user_id:", userId);
+          Alert.alert("Success", `Login successful! Your User ID: ${userId}`);
+          navigation.navigate("Overview");
+        } else {
+          console.log("No user_id received from the server.");
+          Alert.alert("Error", "No user ID received. Please try again.");
         }
-  
-        Alert.alert("Success", "Login successful!");
-        navigation.navigate("Overview");
-  
       } else {
-        Alert.alert(
-          "Error",
-          "Invalid email or password. Please try again.",
-          [
-            { text: "Try Again", onPress: () => console.log("Try Again Pressed") },
-            { text: "Create an account", onPress: () => navigation.navigate("Register") }
-          ]
-        );
+        Alert.alert("Error", "Invalid email or password. Please try again.");
       }
     } catch (error) {
       console.error("Error during login:", error);
@@ -47,14 +55,45 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  // ฟังก์ชันเมื่อคีย์บอร์ดแสดง
+  const handleKeyboardShow = (event) => {
+    setIsKeyboardVisible(true);
+  };
+
+  // ฟังก์ชันเมื่อคีย์บอร์ดซ่อน
+  const handleKeyboardHide = (event) => {
+    setIsKeyboardVisible(false);
+  };
+
+  // ใช้ useEffect เพื่อเพิ่มและลบ event listeners
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", handleKeyboardShow);
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", handleKeyboardHide);
+
+    // ลบ listeners เมื่อ component unmount
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView 
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined} 
+      keyboardVerticalOffset={100}
+>
+
     <ImageBackground source={require("../assets/images/background.jpg")} style={styles.container}>
       <Text style={styles.firstSubtitle}>
         <Text style={{ fontWeight: "bold", color: "#6c9de8" }}>Never waste food again! </Text>
         Our app reminds you of expiration dates and helps you manage your food,
         ensuring you use your ingredients before they go bad!
       </Text>
-      <Text style={styles.subtitle}>________________________________________</Text>
+      <Text style={styles.subtitle}>_____________________________________</Text>
       <Text style={styles.title}>Log In</Text>
       <View style={styles.formContainer}>
         <Text style={styles.label}>Email address</Text>
@@ -85,6 +124,8 @@ const LoginScreen = ({ navigation }) => {
         </Text>
       </View>
     </ImageBackground>
+    </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
