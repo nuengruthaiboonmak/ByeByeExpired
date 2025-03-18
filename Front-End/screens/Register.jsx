@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert, KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Platform, ScrollView } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const RegisterScreen = ({ navigation }) => {
@@ -7,20 +7,6 @@ const RegisterScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
-  // ฟังก์ชันดึงข้อมูล user_id จาก AsyncStorage
-  const getUserID = async () => {
-    try {
-      const userId = await AsyncStorage.getItem('user_id');
-      if (userId !== null) {
-        return userId;
-      }
-      return null;
-    } catch (error) {
-      console.error("Error fetching user_id:", error);
-      return null;
-    }
-  };
 
   const handleRegister = async () => {
     // ตรวจสอบข้อมูลที่กรอก
@@ -59,13 +45,20 @@ const RegisterScreen = ({ navigation }) => {
       const data = await response.json();
   
       if (data.message === "User registered successfully") {
-        // เช็คว่าได้รับ user_id หรือไม่
-        if (data.user_id) {
-          // แปลง user_id เป็น string และเก็บใน AsyncStorage
-          await AsyncStorage.setItem("user_id", data.user_id.toString());
+        if (data.id !== undefined && data.id !== null) {
+          await AsyncStorage.setItem("user_id", data.id.toString()); // ✅ เก็บ user_id
+      
+          // ✅ แสดง user_id หลังสมัครสำเร็จ
+          Alert.alert(
+            "Success",
+            `Registration successful!\nYour User ID: ${data.id}`,
+            [{ text: "OK", onPress: () => navigation.navigate("Login") }]
+          );
+        } else {
+          Alert.alert("Success", "Registration successful, but no user_id returned!");
+          navigation.navigate("Login");
         }
-        Alert.alert("Success", "Registration successful!");
-        navigation.navigate("Login");
+  
       } else if (data.message === "Email already exists") {
         Alert.alert(
           "Error",
@@ -93,45 +86,77 @@ const RegisterScreen = ({ navigation }) => {
     }
   };
 
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  const handleKeyboardShow = (event) => {
+    setIsKeyboardVisible(true);
+  };
+
+  const handleKeyboardHide = (event) => {
+    setIsKeyboardVisible(false);
+  };
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", handleKeyboardShow);
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", handleKeyboardHide);
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
   return (
-    <ImageBackground source={require("../assets/images/background.jpg")} style={styles.container}>
-      <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Login")}>
-        <Text style={styles.backButtonText}>← Back</Text>
-      </TouchableOpacity>
-      <View style={styles.formContainer}>
-        <Text style={styles.headerText}>Create account</Text>
-        <Text style={styles.label}>Full name</Text>
-        <TextInput
-          style={styles.input}
-          value={fullName}
-          onChangeText={setFullName}
-        />
-        <Text style={styles.label}>Email address</Text>
-        <TextInput
-          style={styles.input}
-          value={email}
-          onChangeText={setEmail}
-          keyboardType="email-address"
-        />
-        <Text style={styles.label}>Password</Text>
-        <TextInput
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-          secureTextEntry
-        />
-        <Text style={styles.label}>Confirm Password</Text>
-        <TextInput
-          style={styles.input}
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry
-        />
-        <TouchableOpacity style={styles.button} onPress={handleRegister}>
-          <Text style={styles.buttonText}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-    </ImageBackground>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView 
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined} 
+        keyboardVerticalOffset={100}
+      >
+        <ImageBackground source={require("../assets/images/background.jpg")} style={styles.container}>
+          <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate("Login")}>
+            <Text style={styles.backButtonText}>← Back</Text>
+          </TouchableOpacity>
+          <View style={styles.formContainer}>
+            <ScrollView 
+              contentContainerStyle={styles.scrollContainer}
+            >
+              <Text style={styles.headerText}>Create account</Text>
+              <Text style={styles.label}>Full name</Text>
+              <TextInput
+                style={styles.input}
+                value={fullName}
+                onChangeText={setFullName}
+              />
+              <Text style={styles.label}>Email address</Text>
+              <TextInput
+                style={styles.input}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+              />
+              <Text style={styles.label}>Password</Text>
+              <TextInput
+                style={styles.input}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry
+              />
+              <Text style={styles.label}>Confirm Password</Text>
+              <TextInput
+                style={styles.input}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry
+              />
+              <TouchableOpacity style={styles.button} onPress={handleRegister}>
+                <Text style={styles.buttonText}>Sign Up</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+        </ImageBackground>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
@@ -162,6 +187,9 @@ const styles = StyleSheet.create({
     marginTop: 200,
     paddingBottom: 30,
   },
+  scrollContainer: {
+    flexGrow: 1,
+  },
   headerText: {
     fontSize: 20,
     fontWeight: "600",
@@ -183,12 +211,12 @@ const styles = StyleSheet.create({
     borderColor: "#e8b4e8",
   },
   button: {
-    backgroundColor: "#ffe9f2",//"#f5f5f5",
+    backgroundColor: "#ffe9f2",
     padding: 12,
     borderRadius: 20,
     alignItems: "center",
-    shadowColor: "#000",//"#d9a9d9",
-    shadowOffset: { width: 0, height: 4 },//{ width: 2, height: 2 },
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     marginTop: 30,

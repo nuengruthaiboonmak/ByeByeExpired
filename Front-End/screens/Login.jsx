@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert,KeyboardAvoidingView, Keyboard, TouchableWithoutFeedback, Platform } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setUserID } from '../utils/storage';  // ตรวจสอบเส้นทางให้ถูกต้อง
 
@@ -55,14 +55,45 @@ const LoginScreen = ({ navigation }) => {
     }
   };
 
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
+  // ฟังก์ชันเมื่อคีย์บอร์ดแสดง
+  const handleKeyboardShow = (event) => {
+    setIsKeyboardVisible(true);
+  };
+
+  // ฟังก์ชันเมื่อคีย์บอร์ดซ่อน
+  const handleKeyboardHide = (event) => {
+    setIsKeyboardVisible(false);
+  };
+
+  // ใช้ useEffect เพื่อเพิ่มและลบ event listeners
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener("keyboardDidShow", handleKeyboardShow);
+    const hideSubscription = Keyboard.addListener("keyboardDidHide", handleKeyboardHide);
+
+    // ลบ listeners เมื่อ component unmount
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
+
   return (
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <KeyboardAvoidingView 
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : undefined} 
+      keyboardVerticalOffset={100}
+>
+
     <ImageBackground source={require("../assets/images/background.jpg")} style={styles.container}>
       <Text style={styles.firstSubtitle}>
         <Text style={{ fontWeight: "bold", color: "#6c9de8" }}>Never waste food again! </Text>
         Our app reminds you of expiration dates and helps you manage your food,
         ensuring you use your ingredients before they go bad!
       </Text>
-      <Text style={styles.subtitle}>________________________________________</Text>
+      <Text style={styles.subtitle}>_____________________________________</Text>
       <Text style={styles.title}>Log In</Text>
       <View style={styles.formContainer}>
         <Text style={styles.label}>Email address</Text>
@@ -93,6 +124,8 @@ const LoginScreen = ({ navigation }) => {
         </Text>
       </View>
     </ImageBackground>
+    </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 };
 
