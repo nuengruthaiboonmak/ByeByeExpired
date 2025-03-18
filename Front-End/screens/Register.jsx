@@ -8,6 +8,20 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
+  // ฟังก์ชันดึงข้อมูล user_id จาก AsyncStorage
+  const getUserID = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('user_id');
+      if (userId !== null) {
+        return userId;
+      }
+      return null;
+    } catch (error) {
+      console.error("Error fetching user_id:", error);
+      return null;
+    }
+  };
+
   const handleRegister = async () => {
     // ตรวจสอบข้อมูลที่กรอก
     if (!fullName || !email || !password || !confirmPassword) {
@@ -36,7 +50,7 @@ const RegisterScreen = ({ navigation }) => {
   
     // เชื่อมกับ Backend เพื่อตรวจสอบว่าอีเมลซ้ำหรือไม่
     try {
-      const response = await fetch('https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/register', {
+      const response = await fetch('https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(userData),
@@ -47,8 +61,8 @@ const RegisterScreen = ({ navigation }) => {
       if (data.message === "User registered successfully") {
         // เช็คว่าได้รับ user_id หรือไม่
         if (data.user_id) {
-          // แปลง user_id เป็น integer และเก็บใน AsyncStorage
-          await AsyncStorage.setItem("user_id", data.user_id.toString()); // เก็บเป็น string แต่เป็นตัวเลขที่แปลงมา
+          // แปลง user_id เป็น string และเก็บใน AsyncStorage
+          await AsyncStorage.setItem("user_id", data.user_id.toString());
         }
         Alert.alert("Success", "Registration successful!");
         navigation.navigate("Login");

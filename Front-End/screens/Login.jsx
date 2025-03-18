@@ -16,13 +16,12 @@ const LoginScreen = ({ navigation }) => {
     const loginData = { email, password };
   
     try {
-      const response = await fetch('https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/login', {
+      const response = await fetch('https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),
       });
   
-      // เช็คว่า response.ok เป็น true หรือไม่
       if (!response.ok) {
         const errorMessage = await response.text();
         console.log("Error Response:", errorMessage);
@@ -32,35 +31,23 @@ const LoginScreen = ({ navigation }) => {
   
       const data = await response.json();
   
-      // Debugging Logs
       console.log("Response data:", data);
-      console.log("User Object:", data.user); // เช็ค user object
+      console.log("User Object:", data.user);
   
-      // ตรวจสอบว่า login สำเร็จ
       if (data.message === "Login successful" && data.user) {
-        const userId = data.user._id; // ใช้ _id แทน id
+        const userId = data.user.user_id;
   
         if (userId) {
-          // บันทึก user_id ลงใน AsyncStorage
-          await setUserID(userId)
-          console.log("Logged in _id:", userId);
-          
-          // แจ้งเตือนและนำทางไปยังหน้าต่อไป
+          await AsyncStorage.setItem('user_id', userId.toString());
+          console.log("Logged in user_id:", userId);
           Alert.alert("Success", `Login successful! Your User ID: ${userId}`);
           navigation.navigate("Overview");
         } else {
-          console.log("No _id received from the server.");
+          console.log("No user_id received from the server.");
           Alert.alert("Error", "No user ID received. Please try again.");
         }
       } else {
-        Alert.alert(
-          "Error",
-          "Invalid email or password. Please try again.",
-          [
-            { text: "Try Again", onPress: () => console.log("Try Again Pressed") },
-            { text: "Create an account", onPress: () => navigation.navigate("Register") }
-          ]
-        );
+        Alert.alert("Error", "Invalid email or password. Please try again.");
       }
     } catch (error) {
       console.error("Error during login:", error);

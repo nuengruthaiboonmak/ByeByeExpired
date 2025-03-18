@@ -24,7 +24,7 @@ const ProfileScreen = () => {
         const storedUserId = await AsyncStorage.getItem('user_id');
         if (storedUserId) {
           setUserId(storedUserId);
-          fetchUserData(storedUserId);
+          fetchUserData(storedUserId); // เรียกฟังก์ชันดึงข้อมูลผู้ใช้
         } else {
           console.log("No user ID found in AsyncStorage");
         }
@@ -32,16 +32,14 @@ const ProfileScreen = () => {
         console.error("Error fetching userId from AsyncStorage:", error);
       }
     };
-
+  
     fetchUserId();
   }, []);
-
+  
   const fetchUserData = (userId) => {
     if (userId) {
-      console.log("Sending userId:", userId);
-      axios.get(`https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/get_user/${userId}`)
+      axios.get(`https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/get_user/${userId}`)
         .then(response => {
-          console.log("API Response:", response.data);
           setName(response.data.name);
           setEmail(response.data.email);
         })
@@ -63,7 +61,7 @@ const ProfileScreen = () => {
       return;
     }
     try {
-      await axios.put('https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/update_name', {
+      await axios.put('https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/update_name', {
         user_id: userId,
         name: name,
       });
@@ -82,7 +80,6 @@ const ProfileScreen = () => {
       return;
     }
   
-    // แสดงการแจ้งเตือนก่อนทำการลบบัญชี
     Alert.alert(
       "ลบบัญชี",
       "คุณแน่ใจหรือว่าต้องการลบบัญชีนี้? การลบไม่สามารถกู้คืนได้.",
@@ -92,8 +89,7 @@ const ProfileScreen = () => {
           text: "ลบบัญชี", 
           onPress: async () => {
             try {
-              // ส่ง request ลบบัญชี
-              const response = await axios.delete('https://bug-free-telegram-x5597wr5w69gc9qr9-5001.app.github.dev/delete_account', {
+              const response = await axios.delete('https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/delete_account', {
                 data: { user_id: userId },
               });
               if (response.status === 200) {
