@@ -1,17 +1,49 @@
-import React from "react";
-import { View, Text, TouchableOpacity, FlatList, StyleSheet, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import {
+  View, Text, TouchableOpacity, FlatList, StyleSheet, Image,
+  ActivityIndicator, Alert
+} from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-
-const productData = [
-  { id: "1", name: "เอโร่ ไข่ไก่ เบอร์ 3", quantity: "1 piece", expDate: "4 Mar 2025", image: require("../assets/images/egg.png") },
-  { id: "2", name: "ลูกชิ้นปลากลม", quantity: "1 piece", expDate: "2 Jan 2025", image: require("../assets/images/egg.png") },
-  { id: "3", name: "น้ำมะนาวคั้นสด", quantity: "1 piece", expDate: "9 Jan 2025", image: require("../assets/images/egg.png") },
-  { id: "4", name: "ไก่หมักกล้วยแช่แข็ง", quantity: "2 piece", expDate: "14 Jan 2025", image: require("../assets/images/egg.png") },
-  { id: "5", name: "เลือดไก่", quantity: "1 piece", expDate: "2 Feb 2025", image: require("../assets/images/egg.png") },
-  { id: "6", name: "เครื่องในไก่", quantity: "1 piece", expDate: "10 Feb 2025", image: require("../assets/images/egg.png") },
-];
+import axios from "axios";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const ExpProductScreen = ({ navigation }) => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      try {
+        const storedUserId = await AsyncStorage.getItem('user_id');
+        if (storedUserId) {
+          setUserId(storedUserId);
+          fetchExpiredProducts(storedUserId);
+        } else {
+          console.log("No user ID found in AsyncStorage");
+        }
+      } catch (error) {
+        console.error("Error fetching userId from AsyncStorage:", error);
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
+  const fetchExpiredProducts = async (userId) => {
+    try {
+      const response = await axios.get(
+        `https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/get_expired_items/${userId}`
+      );
+      setProducts(response.data);
+    } catch (error) {
+      console.error("Error fetching expired products:", error);
+      Alert.alert("เกิดข้อผิดพลาด", "ไม่สามารถดึงข้อมูลสินค้าที่หมดอายุได้");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleGoBack = () => {
     navigation.navigate("Overview");
   };
@@ -19,44 +51,63 @@ const ExpProductScreen = ({ navigation }) => {
   const handleGoToNext = () => {
     navigation.navigate("Login");
   };
-  
+
   const handleProductPress = (product) => {
-    navigation.navigate("ShowDetailProduct", { product });
+    navigation.navigate("ShowDetailProduct", {
+      product,
+      onUpdate: (productId, updatedProduct) => {
+        // อัปเดตข้อมูลใน Local State
+        setProducts((prevProducts) =>
+          prevProducts.map((item) =>
+            item._id === productId ? { ...item, ...updatedProduct } : item
+          )
+        );
+      },
+    });
   };
 
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#ffffff" />
+      </View>
+    );
+  }
+
   return (
-    <LinearGradient colors={["#de4f4f","#FFFFFF"]} style={styles.container}>
+    <LinearGradient colors={["#de4f4f", "#FFFFFF"]} style={styles.container}>
       <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
         <Text style={styles.backButtonText}>← Overview</Text>
       </TouchableOpacity>
       <Text style={styles.header}>EXPIRED</Text>
       <FlatList
-        data={productData}
-        keyExtractor={(item) => item.id}
+        data={products}
+        keyExtractor={(item) => item._id}
         numColumns={2}
         columnWrapperStyle={styles.row}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.productCard} onPress={() => handleProductPress(item)}>
-            <Image source={item.image} style={styles.productImage} />
+            <Image source={{ uri: item.photo }} style={styles.productImage} />
             <View style={styles.textBox}>
               <Text style={styles.productName}>{item.name}</Text>
-              <Text style={styles.productQuantity}>{item.quantity}</Text>
-              <Text style={styles.productExpDate}>EXP: {item.expDate}</Text>
+              <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
+              <Text style={styles.productExpDate}>
+                EXP: {new Date(item.expiration_date).toLocaleDateString()}
+              </Text>
             </View>
           </TouchableOpacity>
         )}
-        ListEmptyComponent={<Text style={styles.emptyText}>No products available</Text>}
+        ListEmptyComponent={<Text style={styles.emptyText}>No expired products available</Text>}
       />
-
-    <TouchableOpacity style={styles.rightArrowButton} onPress={handleGoToNext}>
-            <View style={styles.rightArrowButtonCircle}>
-              <Image
-                source={require("../assets/images/exit.png")}
-                style={{ width: 35, height: 35 }}
-              />
-            </View>
-          </TouchableOpacity>
-        </LinearGradient>
+      <TouchableOpacity style={styles.rightArrowButton} onPress={handleGoToNext}>
+        <View style={styles.rightArrowButtonCircle}>
+          <Image
+            source={require("../assets/images/exit.png")}
+            style={{ width: 35, height: 35 }}
+          />
+        </View>
+      </TouchableOpacity>
+    </LinearGradient>
   );
 };
 
@@ -147,12 +198,17 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 5,
   },
-  rightArrowImage: {
-    width: 20,
-    height: 20,
-    resizeMode: "contain",
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
-
+  emptyText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "#555",
+  },
 });
 
 export default ExpProductScreen;

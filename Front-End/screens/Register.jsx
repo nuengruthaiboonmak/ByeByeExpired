@@ -8,19 +8,6 @@ const RegisterScreen = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const getUserID = async () => {
-    try {
-      const userId = await AsyncStorage.getItem('user_id');
-      if (userId !== null) {
-        return userId;
-      }
-      return null;
-    } catch (error) {
-      console.error("Error fetching user_id:", error);
-      return null;
-    }
-  };
-
   const handleRegister = async () => {
     // ตรวจสอบข้อมูลที่กรอก
     if (!fullName || !email || !password || !confirmPassword) {
@@ -58,11 +45,20 @@ const RegisterScreen = ({ navigation }) => {
       const data = await response.json();
   
       if (data.message === "User registered successfully") {
-        if (data.user_id) {
-          await AsyncStorage.setItem("user_id", data.user_id.toString());
+        if (data.id !== undefined && data.id !== null) {
+          await AsyncStorage.setItem("user_id", data.id.toString()); // ✅ เก็บ user_id
+      
+          // ✅ แสดง user_id หลังสมัครสำเร็จ
+          Alert.alert(
+            "Success",
+            `Registration successful!\nYour User ID: ${data.id}`,
+            [{ text: "OK", onPress: () => navigation.navigate("Login") }]
+          );
+        } else {
+          Alert.alert("Success", "Registration successful, but no user_id returned!");
+          navigation.navigate("Login");
         }
-        Alert.alert("Success", "Registration successful!");
-        navigation.navigate("Login");
+  
       } else if (data.message === "Email already exists") {
         Alert.alert(
           "Error",
