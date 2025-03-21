@@ -7,25 +7,31 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from "axios";
 
 export default function App() {
+  // State สำหรับเก็บวันที่ปัจจุบัน
   const [currentDate, setCurrentDate] = useState("");
+  // Hook สำหรับการนำทางระหว่างหน้า
   const navigation = useNavigation();
+  // State สำหรับเก็บรายการสินค้าใกล้หมดอายุ
   const [nearlyExpired, setNearlyExpired] = useState([]);
+  // State สำหรับเก็บรายการสินค้าหมดอายุ
   const [expired, setExpired] = useState([]);
+  // State สำหรับเก็บ user_id
   const [userId, setUserId] = useState(null);
+  // State สำหรับเก็บข้อมูลพื้นที่เก็บสินค้า
   const [storage, setStorage] = useState([
     { name: "Fridge", count: 0, image: require("../assets/images/fridge.png"), screen: "StorageFridge" },
     { name: "Freezer", count: 0, image: require("../assets/images/freezer.png"), screen: "StorageFreezer" },
     { name: "Dry food", count: 0, image: require("../assets/images/dryFood.png"), screen: "StorageDryFood" },
   ]);
 
-  // ตั้งค่าวันที่ปัจจุบัน
+  // ตั้งค่าวันที่ปัจจุบันเมื่อ component ถูกโหลด
   useEffect(() => {
     const date = new Date();
     const formattedDate = date.toLocaleDateString("en-GB").replace(/\//g, "-");
     setCurrentDate(formattedDate);
   }, []);
 
-  // ดึง user_id จาก AsyncStorage
+  // ดึง user_id จาก AsyncStorage เมื่อ component ถูกโหลด
   useEffect(() => {
     const fetchUserId = async () => {
       const storedUserId = await AsyncStorage.getItem('user_id');
@@ -36,7 +42,7 @@ export default function App() {
     fetchUserId();
   }, []);
 
-  // ดึงข้อมูลสินค้าใกล้หมดอายุและหมดอายุ
+  // ดึงข้อมูลสินค้าใกล้หมดอายุและหมดอายุเมื่อ user_id เปลี่ยนแปลง
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -56,7 +62,7 @@ export default function App() {
     fetchData();
   }, [userId]);
 
-  // ดึงข้อมูลจำนวนสินค้าในแต่ละพื้นที่เก็บ
+  // ดึงข้อมูลจำนวนสินค้าในแต่ละพื้นที่เก็บเมื่อ user_id เปลี่ยนแปลง
   useEffect(() => {
     const fetchStorageCounts = async () => {
       try {
@@ -166,19 +172,25 @@ export default function App() {
             </View>
           </LinearGradient>
           <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 120, elevation: 5 }}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {nearlyExpired.map((item) => (
-                <TouchableOpacity
-                  key={item._id}
-                  onPress={() => navigation.navigate("NearlyExpired", { productId: item._id, userId })}
-                >
-                  <View style={{ backgroundColor: "#FFEBEB", borderRadius: 10, padding: 15, marginRight: 10, width: 90, height: 90, justifyContent: "center", alignItems: "center" }}>
-                    <Image source={{ uri: item.photo }} style={{ width: 50, height: 50, marginTop: 10 }} />
-                    <Text style={{ fontSize: 10, color: "#7C0A0A", textAlign: "center", marginBottom: 10 }}>{item.name}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+            {nearlyExpired.length === 0 ? (
+              <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Text style={{ fontSize: 16, color: "#7C0A0A" }}>There are no products.</Text>
+              </View>
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {nearlyExpired.map((item) => (
+                  <TouchableOpacity
+                    key={item._id}
+                    onPress={() => navigation.navigate("NearlyExpired", { productId: item._id, userId })}
+                  >
+                    <View style={{ backgroundColor: "#FFEBEB", borderRadius: 10, padding: 15, marginRight: 10, width: 90, height: 90, justifyContent: "center", alignItems: "center" }}>
+                      <Image source={{ uri: item.photo }} style={{ width: 50, height: 50, marginTop: 10 }} />
+                      <Text style={{ fontSize: 10, color: "#7C0A0A", textAlign: "center", marginBottom: 10 }}>{item.name}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
           </View>
         </View>
 
@@ -191,19 +203,25 @@ export default function App() {
             </View>
           </LinearGradient>
           <View style={{ backgroundColor: "#FCFCFF", borderRadius: 20, padding: 15, marginTop: 10, height: 120, elevation: 5 }}>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {expired.map((item) => (
-                <TouchableOpacity
-                  key={item._id}
-                  onPress={() => navigation.navigate("Expired", { productId: item._id })}
-                >
-                  <View style={{ backgroundColor: "#FFEBEB", borderRadius: 10, padding: 15, marginRight: 10, width: 90, height: 90, justifyContent: "center", alignItems: "center" }}>
-                    <Image source={{ uri: item.photo }} style={{ width: 50, height: 50, marginTop: 10 }} />
-                    <Text style={{ fontSize: 10, color: "#7C0A0A", textAlign: "center", marginBottom: 10 }}>{item.name}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
+            {expired.length === 0 ? (
+              <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Text style={{ fontSize: 16, color: "#7C0A0A" }}>There are no products.</Text>
+              </View>
+            ) : (
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {expired.map((item) => (
+                  <TouchableOpacity
+                    key={item._id}
+                    onPress={() => navigation.navigate("Expired", { productId: item._id })}
+                  >
+                    <View style={{ backgroundColor: "#FFEBEB", borderRadius: 10, padding: 15, marginRight: 10, width: 90, height: 90, justifyContent: "center", alignItems: "center" }}>
+                      <Image source={{ uri: item.photo }} style={{ width: 50, height: 50, marginTop: 10 }} />
+                      <Text style={{ fontSize: 10, color: "#7C0A0A", textAlign: "center", marginBottom: 10 }}>{item.name}</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            )}
           </View>
         </View>
 
