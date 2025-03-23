@@ -44,7 +44,7 @@ const ProfileScreen = () => {
   // ฟังก์ชันสำหรับดึงข้อมูลผู้ใช้จาก API
   const fetchUserData = (userId) => {
     if (userId) {
-      axios.get(`https://ominous-barnacle-x5rv457rpx5x3969-5000.app.github.dev/get_user/${userId}`)
+      axios.get(`https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/get_user/${userId}`)
         .then(response => {
           setName(response.data.name);
           setEmail(response.data.email);
@@ -67,7 +67,7 @@ const ProfileScreen = () => {
       return;
     }
     try {
-      await axios.put('https://ominous-barnacle-x5rv457rpx5x3969-5000.app.github.dev/update_name', {
+      await axios.put('https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/update_name', {
         user_id: userId,
         name: name,
       });

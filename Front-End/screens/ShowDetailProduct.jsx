@@ -10,56 +10,40 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
-  Keyboard, // เพิ่มบรรทัดนี้
+  ScrollView,
+  Keyboard,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient"; // ใช้สร้างพื้นหลังแบบไล่สี
-import axios from "axios"; // ใช้สำหรับส่ง HTTP Request
-import AsyncStorage from "@react-native-async-storage/async-storage"; // ใช้สำหรับเก็บข้อมูลในอุปกรณ์
-import DropDownPicker from "react-native-dropdown-picker"; // ใช้สำหรับสร้าง Dropdown Menu
-import DateTimePicker from "@react-native-community/datetimepicker"; // ใช้สำหรับเลือกวันที่
-import { Ionicons } from "@expo/vector-icons"; // ใช้สำหรับไอคอน
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"; // ใช้สำหรับเลื่อนหน้าจอเมื่อแป้นพิมพ์แสดงขึ้น
+import { LinearGradient } from "expo-linear-gradient";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import DropDownPicker from "react-native-dropdown-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import { Ionicons } from "@expo/vector-icons";
 
 const ShowDetailofProduct = ({ route, navigation }) => {
-  // รับข้อมูลสินค้าจาก route.params
   const { product } = route.params;
-
-  // State สำหรับตรวจสอบว่าอยู่ในโหมดแก้ไขหรือไม่
   const [isEditing, setIsEditing] = useState(false);
-
-  // State สำหรับเก็บข้อมูลสินค้าที่แก้ไข
   const [editedProduct, setEditedProduct] = useState({ ...product });
 
-  // State สำหรับควบคุมการแสดง Date Picker ของวันหมดอายุ
+  // State สำหรับ Date Picker
   const [showExpirationDatePicker, setShowExpirationDatePicker] = useState(false);
+  const [tempExpirationDate, setTempExpirationDate] = useState(new Date(editedProduct.expiration_date));
 
-  // State สำหรับเก็บวันที่หมดอายุชั่วคราว (ใช้กับ Date Picker)
-  const [tempExpirationDate, setTempExpirationDate] = useState(
-    new Date(editedProduct.expiration_date)
-  );
-
-  // ฟังก์ชันสำหรับบันทึกการแก้ไขข้อมูลสินค้า
   const handleSave = async () => {
     try {
-      // ดึง user_id จาก AsyncStorage
       const userId = await AsyncStorage.getItem("user_id");
       if (!userId) {
         Alert.alert("Error", "User ID not found");
         return;
       }
-
-      // ตรวจสอบว่าข้อมูลถูกกรอกครบถ้วนหรือไม่
-      if (
-        !editedProduct.name ||
-        !editedProduct.storage ||
-        !editedProduct.storage_date ||
-        !editedProduct.expiration_date
-      ) {
+  
+      // ตรวจสอบข้อมูลก่อนส่ง request
+      if (!editedProduct.name || !editedProduct.storage || !editedProduct.storage_date || !editedProduct.expiration_date) {
         Alert.alert("Error", "Please fill in all fields");
         return;
       }
-
-      // สร้างข้อมูลสินค้าที่แก้ไข
+  
+      // สร้างข้อมูลใหม่โดยไม่รวม _id
       const updatedProduct = {
         name: editedProduct.name,
         storage: editedProduct.storage,
@@ -68,35 +52,39 @@ const ShowDetailofProduct = ({ route, navigation }) => {
         quantity: editedProduct.quantity,
         note: editedProduct.note,
         photo: editedProduct.photo,
-        user_id: parseInt(editedProduct.user_id),
+        user_id: parseInt(editedProduct.user_id), // แปลง user_id เป็น integer
       };
-
-      // ส่งข้อมูลไปยังเซิร์ฟเวอร์เพื่ออัปเดต
+  
+      // แสดงข้อมูลที่ส่งไปยังเซิร์ฟเวอร์เพื่อตรวจสอบ
+      console.log("Data being sent to server:", updatedProduct);
+  
       const response = await axios.put(
-        `https://ominous-barnacle-x5rv457rpx5x3969-5000.app.github.dev/update_item/${editedProduct._id}`,
+        `https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/update_item/${editedProduct._id}`,
         updatedProduct
       );
-
-      // ถ้าอัปเดตสำเร็จ
+  
       if (response.status === 200) {
-        // อัปเดต State และแสดงข้อความสำเร็จ
+        // อัปเดต Local State
         setEditedProduct((prevProduct) => ({
           ...prevProduct,
           ...updatedProduct,
         }));
+  
+        // แสดงข้อความสำเร็จ
         Alert.alert("Success", "Product updated successfully");
+  
+        // ปิดโหมดแก้ไข
         setIsEditing(false);
-
-        // ถ้ามีฟังก์ชัน onUpdate ใน route.params ให้เรียกใช้
+  
+        // อัปเดตข้อมูลในหน้ารายการสินค้า (ถ้ามี callback function)
         if (route.params?.onUpdate) {
           route.params.onUpdate(editedProduct._id, updatedProduct);
         }
-
-        // กลับไปยังหน้าจอก่อนหน้า
+  
+        // กลับไปยังหน้าก่อนหน้า
         navigation.goBack();
       }
     } catch (error) {
-      // จัดการข้อผิดพลาด
       console.error("Error updating product:", error);
       if (error.response) {
         console.error("Server response:", error.response.data);
@@ -105,9 +93,7 @@ const ShowDetailofProduct = ({ route, navigation }) => {
     }
   };
 
-  // ฟังก์ชันสำหรับลบสินค้า
   const handleDelete = async () => {
-    // แสดง Alert เพื่อยืนยันการลบ
     Alert.alert(
       "Confirm Deletion",
       "Are you sure you want to delete this product?",
@@ -120,25 +106,21 @@ const ShowDetailofProduct = ({ route, navigation }) => {
           text: "Yes",
           onPress: async () => {
             try {
-              // ดึง user_id จาก AsyncStorage
               const userId = await AsyncStorage.getItem("user_id");
               if (!userId) {
                 Alert.alert("Error", "User ID not found");
                 return;
               }
 
-              // ส่ง Request ลบสินค้าไปยังเซิร์ฟเวอร์
               const response = await axios.delete(
-                `https://ominous-barnacle-x5rv457rpx5x3969-5000.app.github.dev/delete_item/${editedProduct._id}`
+                `https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/delete_item/${editedProduct._id}`
               );
 
-              // ถ้าลบสำเร็จ
               if (response.status === 200) {
                 Alert.alert("Success", "Product deleted successfully");
                 navigation.goBack();
               }
             } catch (error) {
-              // จัดการข้อผิดพลาด
               console.error("Error deleting product:", error);
               Alert.alert("Error", "Failed to delete product");
             }
@@ -148,19 +130,13 @@ const ShowDetailofProduct = ({ route, navigation }) => {
     );
   };
 
-  // ฟังก์ชันสำหรับจัดการการเปลี่ยนแปลงวันที่หมดอายุ
   const onChangeExpirationDate = (event, selectedDate) => {
     const currentDate = selectedDate || tempExpirationDate;
     setTempExpirationDate(currentDate);
   };
 
-  // ฟังก์ชันสำหรับยืนยันวันที่หมดอายุ
-  //
   const confirmExpirationDate = () => {
-    setEditedProduct({
-      ...editedProduct,
-      expiration_date: tempExpirationDate.toISOString(),
-    });
+    setEditedProduct({ ...editedProduct, expiration_date: tempExpirationDate.toISOString() });
     setShowExpirationDatePicker(false);
   };
 
@@ -183,16 +159,13 @@ const ShowDetailofProduct = ({ route, navigation }) => {
                 <Text style={styles.saveButtonText}>Save</Text>
               </TouchableOpacity>
             ) : (
-              <View style={{ width: 50 }} />
+              <View style={{ width: 50 }} /> // ใช้ View เปล่าป้องกันการดัน Layout
             )}
           </View>
 
-          <KeyboardAwareScrollView
+          <ScrollView
             contentContainerStyle={styles.scrollContainer}
             keyboardShouldPersistTaps="handled"
-            enableOnAndroid={true}
-            extraScrollHeight={100}
-            extraHeight={100}
           >
             <View style={styles.productContainer}>
               <Image
@@ -211,6 +184,7 @@ const ShowDetailofProduct = ({ route, navigation }) => {
                     placeholder="Product Name"
                   />
 
+                  {/* แสดงค่า storage และ storageDate แบบข้อความ */}
                   <Text style={styles.label}>Storage</Text>
                   <Text style={styles.productText}>{editedProduct.storage}</Text>
 
@@ -281,7 +255,7 @@ const ShowDetailofProduct = ({ route, navigation }) => {
                 </>
               )}
             </View>
-          </KeyboardAwareScrollView>
+          </ScrollView>
 
           <View style={styles.buttonContainer}>
             {!isEditing && (
@@ -297,6 +271,7 @@ const ShowDetailofProduct = ({ route, navigation }) => {
             </TouchableOpacity>
           </View>
 
+          {/* DateTimePicker สำหรับ Expiration Date */}
           {showExpirationDatePicker && (
             <View style={styles.dateTimePickerContainer}>
               <DateTimePicker
@@ -306,10 +281,7 @@ const ShowDetailofProduct = ({ route, navigation }) => {
                 onChange={onChangeExpirationDate}
                 textColor="black"
               />
-              <TouchableOpacity
-                style={styles.confirmButton}
-                onPress={confirmExpirationDate}
-              >
+              <TouchableOpacity style={styles.confirmButton} onPress={confirmExpirationDate}>
                 <Text style={styles.confirmText}>Confirm</Text>
               </TouchableOpacity>
             </View>
