@@ -34,7 +34,7 @@ const StorageFreezerScreen = ({ navigation }) => {
   const fetchFreezerProducts = async (userId) => {
     try {
       const response = await axios.get(
-        `https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/get_freezer_items/${userId}`
+        `https://ominous-barnacle-x5rv457rpx5x3969-5000.app.github.dev/get_freezer_items/${userId}`
       );
       setProducts(response.data);
     } catch (error) {

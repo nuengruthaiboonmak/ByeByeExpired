@@ -16,7 +16,7 @@ const LoginScreen = ({ navigation }) => {
     const loginData = { email, password };
   
     try {
-      const response = await fetch('https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/login', {
+      const response = await fetch('https://ominous-barnacle-x5rv457rpx5x3969-5000.app.github.dev/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),
