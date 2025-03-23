@@ -11,11 +11,16 @@ import { Ionicons } from "@expo/vector-icons";
 const { width } = Dimensions.get("window");
 
 const AllProductScreen = ({ navigation }) => {
+  // State สำหรับเก็บข้อมูลสินค้า
   const [products, setProducts] = useState([]);
+  // State สำหรับตรวจสอบสถานะการโหลดข้อมูล
   const [loading, setLoading] = useState(true);
+  // State สำหรับเก็บ user_id
   const [userId, setUserId] = useState(null);
-  const [sortOrder, setSortOrder] = useState("asc"); // "asc" = เรียงจากน้อยไปมาก, "desc" = เรียงจากมากไปน้อย
+  // State สำหรับเก็บลำดับการเรียงสินค้า ("asc" = เรียงจากน้อยไปมาก, "desc" = เรียงจากมากไปน้อย)
+  const [sortOrder, setSortOrder] = useState("asc");
 
+  // useEffect สำหรับดึง user_id จาก AsyncStorage และดึงข้อมูลสินค้า
   useEffect(() => {
     const fetchUserId = async () => {
       try {
@@ -34,6 +39,7 @@ const AllProductScreen = ({ navigation }) => {
     fetchUserId();
   }, []);
 
+  // ฟังก์ชันสำหรับดึงข้อมูลสินค้าจาก API
   const fetchProducts = async (userId) => {
     try {
       const response = await axios.get(
@@ -42,20 +48,23 @@ const AllProductScreen = ({ navigation }) => {
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching products:", error);
-      Alert.alert("เกิดข้อผิดพลาด", "ไม่สามารถดึงข้อมูลสินค้าได้");
+      Alert.alert("Error", "Unable to fetch products"); // ✅ เปลี่ยนข้อความเป็นภาษาอังกฤษ
     } finally {
       setLoading(false);
     }
   };
 
+  // ฟังก์ชันสำหรับนำทางกลับไปหน้า Overview
   const handleGoBack = () => {
     navigation.navigate("Overview");
   };
 
+  // ฟังก์ชันสำหรับนำทางไปหน้า Login
   const handleGoToNext = () => {
     navigation.navigate("Login");
   };
 
+  // ฟังก์ชันสำหรับนำทางไปหน้าแสดงรายละเอียดสินค้า
   const handleProductPress = (product) => {
     navigation.navigate("ShowDetailProduct", {
       product,
@@ -70,12 +79,15 @@ const AllProductScreen = ({ navigation }) => {
     });
   };
 
+  // ฟังก์ชันสำหรับสลับลำดับการเรียงสินค้า
   const toggleSortOrder = () => {
     setSortOrder((prevOrder) => (prevOrder === "asc" ? "desc" : "asc"));
   };
 
+  // เรียงลำดับสินค้าตามวันที่หมดอายุ
   const sortedProducts = sortProducts([...products], sortOrder);
 
+  // แสดง ActivityIndicator หากกำลังโหลดข้อมูล
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -85,19 +97,28 @@ const AllProductScreen = ({ navigation }) => {
   }
 
   return (
+    // ใช้ LinearGradient สำหรับพื้นหลัง
     <LinearGradient colors={["#a4d2ff", "#FFFFFF"]} style={styles.container}>
+      {/* ปุ่มกลับไปหน้า Overview */}
       <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
         <Text style={styles.backButtonText}>← Overview</Text>
       </TouchableOpacity>
+
+      {/* หัวข้อหน้า */}
       <Text style={styles.header}>ALL PRODUCT</Text>
+
+      {/* แสดงรายการสินค้าในรูปแบบ FlatList */}
       <FlatList
         data={sortedProducts}
-        keyExtractor={(item) => item._id}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
+        keyExtractor={(item) => item._id} // ใช้ _id เป็น key
+        numColumns={2} // แสดงสินค้า 2 คอลัมน์
+        columnWrapperStyle={styles.row} // จัดวางสินค้าในแต่ละแถว
         renderItem={({ item }) => (
+          // การ์ดแสดงข้อมูลสินค้า
           <TouchableOpacity style={styles.productCard} onPress={() => handleProductPress(item)}>
+            {/* รูปภาพสินค้า */}
             <Image source={{ uri: item.photo }} style={styles.productImage} />
+            {/* ข้อมูลสินค้า */}
             <View style={styles.textBox}>
               <Text style={styles.productName}>{item.name}</Text>
               <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
@@ -107,8 +128,11 @@ const AllProductScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         )}
+        // แสดงข้อความเมื่อไม่มีสินค้า
         ListEmptyComponent={<Text style={styles.emptyText}>No products available</Text>}
       />
+
+      {/* ปุ่มนำทางไปหน้า Login */}
       <TouchableOpacity style={styles.rightArrowButton} onPress={handleGoToNext}>
         <View style={styles.rightArrowButtonCircle}>
           <Image
@@ -117,7 +141,8 @@ const AllProductScreen = ({ navigation }) => {
           />
         </View>
       </TouchableOpacity>
-      {/* ปุ่มเรียงลำดับ */}
+
+      {/* ปุ่มเรียงลำดับสินค้า */}
       <TouchableOpacity style={styles.sortButton} onPress={toggleSortOrder}>
         <Ionicons
           name={sortOrder === "asc" ? "arrow-up" : "arrow-down"}
@@ -129,6 +154,7 @@ const AllProductScreen = ({ navigation }) => {
   );
 };
 
+// ฟังก์ชันสำหรับเรียงลำดับสินค้าตามวันที่หมดอายุ
 const sortProducts = (products, order) => {
   return products.sort((a, b) => {
     const dateA = new Date(a.expiration_date);
@@ -137,6 +163,7 @@ const sortProducts = (products, order) => {
   });
 };
 
+// สไตล์สำหรับ component
 const styles = StyleSheet.create({
   container: {
     flex: 1,

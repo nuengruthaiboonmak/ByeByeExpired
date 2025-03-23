@@ -7,56 +7,70 @@ import { LinearGradient } from "expo-linear-gradient";
 import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// ExpProductScreen คอมโพเนนต์สำหรับแสดงสินค้าที่หมดอายุ
 const ExpProductScreen = ({ navigation }) => {
+  // State สำหรับเก็บรายการสินค้าที่หมดอายุ
   const [products, setProducts] = useState([]);
+  // State สำหรับจัดการสถานะการโหลดข้อมูล
   const [loading, setLoading] = useState(true);
+  // State สำหรับเก็บ ID ของผู้ใช้
   const [userId, setUserId] = useState(null);
 
+  // useEffect สำหรับดึง ID ผู้ใช้จาก AsyncStorage และดึงข้อมูลสินค้าที่หมดอายุ
   useEffect(() => {
     const fetchUserId = async () => {
       try {
+        // ดึง ID ผู้ใช้จาก AsyncStorage
         const storedUserId = await AsyncStorage.getItem('user_id');
         if (storedUserId) {
           setUserId(storedUserId);
+          // ดึงข้อมูลสินค้าที่หมดอายุโดยใช้ ID ผู้ใช้
           fetchExpiredProducts(storedUserId);
         } else {
-          console.log("No user ID found in AsyncStorage");
+          console.log("ไม่พบ ID ผู้ใช้ใน AsyncStorage");
         }
       } catch (error) {
-        console.error("Error fetching userId from AsyncStorage:", error);
+        console.error("เกิดข้อผิดพลาดในการดึง ID ผู้ใช้จาก AsyncStorage:", error);
       }
     };
 
     fetchUserId();
   }, []);
 
+  // ฟังก์ชันสำหรับดึงข้อมูลสินค้าที่หมดอายุจากเซิร์ฟเวอร์
   const fetchExpiredProducts = async (userId) => {
     try {
       const response = await axios.get(
         `https://cuddly-space-lamp-jj4jqr7jvg5q2qvpg-5000.app.github.dev/get_expired_items/${userId}`
       );
+      // อัปเดตรายการสินค้าที่หมดอายุใน state
       setProducts(response.data);
     } catch (error) {
-      console.error("Error fetching expired products:", error);
-      Alert.alert("เกิดข้อผิดพลาด", "ไม่สามารถดึงข้อมูลสินค้าที่หมดอายุได้");
+      console.error("เกิดข้อผิดพลาดในการดึงข้อมูลสินค้าที่หมดอายุ:", error);
+      // แสดง Alert หากเกิดข้อผิดพลาดในการดึงข้อมูล
+      Alert.alert("Error", "ไม่สามารถดึงข้อมูลสินค้าที่หมดอายุได้");
     } finally {
+      // ตั้งค่า loading เป็น false เมื่อการดึงข้อมูลเสร็จสิ้น
       setLoading(false);
     }
   };
 
+  // ฟังก์ชันสำหรับกลับไปยังหน้า Overview
   const handleGoBack = () => {
     navigation.navigate("Overview");
   };
 
+  // ฟังก์ชันสำหรับไปยังหน้า Login
   const handleGoToNext = () => {
     navigation.navigate("Login");
   };
 
+  // ฟังก์ชันสำหรับเมื่อผู้ใช้กดที่สินค้า เพื่อไปยังหน้าดูรายละเอียดสินค้า
   const handleProductPress = (product) => {
     navigation.navigate("ShowDetailProduct", {
       product,
       onUpdate: (productId, updatedProduct) => {
-        // อัปเดตข้อมูลใน Local State
+        // อัปเดตข้อมูลสินค้าใน state
         setProducts((prevProducts) =>
           prevProducts.map((item) =>
             item._id === productId ? { ...item, ...updatedProduct } : item
@@ -66,6 +80,7 @@ const ExpProductScreen = ({ navigation }) => {
     });
   };
 
+  // แสดง Loading Indicator หากกำลังโหลดข้อมูล
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -76,10 +91,13 @@ const ExpProductScreen = ({ navigation }) => {
 
   return (
     <LinearGradient colors={["#de4f4f", "#FFFFFF"]} style={styles.container}>
+      {/* ปุ่มกลับไปยังหน้า Overview */}
       <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
         <Text style={styles.backButtonText}>← Overview</Text>
       </TouchableOpacity>
+      {/* หัวข้อของหน้าจอ */}
       <Text style={styles.header}>EXPIRED</Text>
+      {/* FlatList สำหรับแสดงรายการสินค้าที่หมดอายุ */}
       <FlatList
         data={products}
         keyExtractor={(item) => item._id}
@@ -87,18 +105,24 @@ const ExpProductScreen = ({ navigation }) => {
         columnWrapperStyle={styles.row}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.productCard} onPress={() => handleProductPress(item)}>
+            {/* รูปภาพสินค้า */}
             <Image source={{ uri: item.photo }} style={styles.productImage} />
             <View style={styles.textBox}>
+              {/* ชื่อสินค้า */}
               <Text style={styles.productName}>{item.name}</Text>
+              {/* จำนวนสินค้า */}
               <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
+              {/* วันที่หมดอายุ */}
               <Text style={styles.productExpDate}>
                 EXP: {new Date(item.expiration_date).toLocaleDateString()}
               </Text>
             </View>
           </TouchableOpacity>
         )}
-        ListEmptyComponent={<Text style={styles.emptyText}>No expired products available</Text>}
+        // แสดงข้อความหากไม่มีสินค้าที่หมดอายุ
+        ListEmptyComponent={<Text style={styles.emptyText}>ไม่มีสินค้าที่หมดอายุ</Text>}
       />
+      {/* ปุ่มสำหรับไปยังหน้า Login */}
       <TouchableOpacity style={styles.rightArrowButton} onPress={handleGoToNext}>
         <View style={styles.rightArrowButtonCircle}>
           <Image
@@ -111,6 +135,7 @@ const ExpProductScreen = ({ navigation }) => {
   );
 };
 
+// สไตล์สำหรับคอมโพเนนต์
 const styles = StyleSheet.create({
   container: {
     flex: 1,

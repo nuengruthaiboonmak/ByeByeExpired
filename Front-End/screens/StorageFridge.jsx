@@ -8,17 +8,24 @@ import axios from "axios";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const StorageFridgeScreen = ({ navigation }) => {
+  // State สำหรับเก็บคำค้นหา
   const [searchQuery, setSearchQuery] = useState("");
+  // State สำหรับเก็บข้อมูลสินค้าในตู้เย็น
   const [products, setProducts] = useState([]);
+  // State สำหรับตรวจสอบสถานะการโหลดข้อมูล
   const [loading, setLoading] = useState(true);
+  // State สำหรับเก็บ user_id
   const [userId, setUserId] = useState(null);
 
+  // useEffect สำหรับดึง user_id จาก AsyncStorage และดึงข้อมูลสินค้าในตู้เย็น
   useEffect(() => {
     const fetchUserId = async () => {
       try {
+        // ดึง user_id จาก AsyncStorage
         const storedUserId = await AsyncStorage.getItem('user_id');
         if (storedUserId) {
           setUserId(storedUserId);
+          // ดึงข้อมูลสินค้าในตู้เย็น
           fetchFridgeProducts(storedUserId);
         } else {
           console.log("No user ID found in AsyncStorage");
@@ -31,37 +38,44 @@ const StorageFridgeScreen = ({ navigation }) => {
     fetchUserId();
   }, []);
 
+  // ฟังก์ชันสำหรับดึงข้อมูลสินค้าในตู้เย็นจาก API
   const fetchFridgeProducts = async (userId) => {
     try {
       const response = await axios.get(
         `https://ominous-barnacle-x5rv457rpx5x3969-5000.app.github.dev/get_fridge_items/${userId}`
       );
+      // อัปเดต state products ด้วยข้อมูลที่ได้จาก API
       setProducts(response.data);
     } catch (error) {
       console.error("Error fetching fridge products:", error);
       Alert.alert("เกิดข้อผิดพลาด", "ไม่สามารถดึงข้อมูลสินค้าได้");
     } finally {
+      // ปิดสถานะการโหลด
       setLoading(false);
     }
   };
 
+  // ฟังก์ชันสำหรับนำทางไปหน้าเพิ่มสินค้า
   const handleAddProduct = () => {
     navigation.navigate("AddProduct");
   };
 
+  // ฟังก์ชันสำหรับนำทางกลับไปหน้า Overview
   const handleGoBack = () => {
     navigation.navigate("Overview");
   };
 
+  // ฟังก์ชันสำหรับนำทางไปหน้า Login
   const handleGoToNext = () => {
-    navigation.navigate("Login"); // เปลี่ยนการนำทางไปหน้า Overview
+    navigation.navigate("Login");
   };
 
+  // ฟังก์ชันสำหรับนำทางไปหน้าแสดงรายละเอียดสินค้า
   const handleProductPress = (product) => {
     navigation.navigate("ShowDetailProduct", {
       product,
       onUpdate: (productId, updatedProduct) => {
-        // อัปเดตข้อมูลใน Local State
+        // อัปเดตข้อมูลสินค้าใน local state
         setProducts((prevProducts) =>
           prevProducts.map((item) =>
             item._id === productId ? { ...item, ...updatedProduct } : item
@@ -71,17 +85,19 @@ const StorageFridgeScreen = ({ navigation }) => {
     });
   };
 
-  // ฟังก์ชันกรองสินค้าตามคำค้นหา
+  // ฟังก์ชันสำหรับกรองสินค้าตามคำค้นหา
   const filterProducts = (products, query) => {
     if (!query) {
       return products; // ถ้าไม่มีคำค้นหา ให้แสดงสินค้าทั้งหมด
     }
 
+    // กรองสินค้าที่ชื่อเริ่มต้นด้วยคำค้นหา (ไม่สนใจตัวพิมพ์เล็ก-ใหญ่)
     return products.filter((product) =>
       product.name.toLowerCase().startsWith(query.toLowerCase())
     );
   };
 
+  // แสดง ActivityIndicator หากกำลังโหลดข้อมูล
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
@@ -91,11 +107,17 @@ const StorageFridgeScreen = ({ navigation }) => {
   }
 
   return (
+    // ใช้ LinearGradient สำหรับพื้นหลัง
     <LinearGradient colors={["#FFFFFF", "#FFB6C1"]} style={styles.container}>
+      {/* ปุ่มกลับไปหน้า Overview */}
       <TouchableOpacity onPress={handleGoBack} style={styles.backButton}>
         <Text style={styles.backButtonText}>← Overview</Text>
       </TouchableOpacity>
+
+      {/* หัวข้อหน้า */}
       <Text style={styles.header}>FRIDGE</Text>
+
+      {/* ช่องค้นหาสินค้า */}
       <TextInput
         style={styles.searchBox}
         placeholder="Search Product"
@@ -103,14 +125,19 @@ const StorageFridgeScreen = ({ navigation }) => {
         value={searchQuery}
         onChangeText={setSearchQuery}
       />
+
+      {/* แสดงรายการสินค้าในรูปแบบ FlatList */}
       <FlatList
         data={filterProducts(products, searchQuery)} // กรองสินค้าตามคำค้นหา
-        keyExtractor={(item) => item._id}
-        numColumns={2}
-        columnWrapperStyle={styles.row}
+        keyExtractor={(item) => item._id} // ใช้ _id เป็น key
+        numColumns={2} // แสดงสินค้า 2 คอลัมน์
+        columnWrapperStyle={styles.row} // จัดวางสินค้าในแต่ละแถว
         renderItem={({ item }) => (
+          // การ์ดแสดงข้อมูลสินค้า
           <TouchableOpacity style={styles.productCard} onPress={() => handleProductPress(item)}>
+            {/* รูปภาพสินค้า */}
             <Image source={{ uri: item.photo }} style={styles.productImage} />
+            {/* ข้อมูลสินค้า */}
             <View style={styles.textBox}>
               <Text style={styles.productName}>{item.name}</Text>
               <Text style={styles.productQuantity}>Quantity: {item.quantity}</Text>
@@ -120,8 +147,11 @@ const StorageFridgeScreen = ({ navigation }) => {
             </View>
           </TouchableOpacity>
         )}
+        // แสดงข้อความเมื่อไม่มีสินค้า
         ListEmptyComponent={<Text style={styles.emptyText}>No products available</Text>}
       />
+
+      {/* ปุ่มเพิ่มสินค้า */}
       <View style={styles.addButtonContainer}>
         <View style={styles.addButtonBackground}>
           <TouchableOpacity style={styles.addButton} onPress={handleAddProduct}>
@@ -132,6 +162,8 @@ const StorageFridgeScreen = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      {/* ปุ่มนำทางไปหน้า Login */}
       <TouchableOpacity style={styles.rightArrowButton} onPress={handleGoToNext}>
         <View style={styles.rightArrowButtonCircle}>
           <Image
@@ -144,6 +176,7 @@ const StorageFridgeScreen = ({ navigation }) => {
   );
 };
 
+// สไตล์สำหรับ component
 const styles = StyleSheet.create({
   container: {
     flex: 1,
