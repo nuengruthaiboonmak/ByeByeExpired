@@ -493,6 +493,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   //สไตล์รูปภาพที่แสดงในพื้นที่เลือกรูปภาพ
+  //
   imagePreview: {
     width: "100%",
     height: "100%",
