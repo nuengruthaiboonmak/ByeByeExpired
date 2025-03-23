@@ -21,12 +21,6 @@ const LoginScreen = ({ navigation }) => {
     const loginData = { email, password };
 
     try {
-<<<<<<< HEAD
-      const response = await fetch('https://ominous-barnacle-x5rv457rpx5x3969-5000.app.github.dev/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(loginData),
-=======
       // ส่ง request ไปยัง back-end เพื่อทำการ Login
       // await ใช้เพื่อรอให้การส่ง request เสร็จสิ้นและได้รับ response จาก server.
       // fetch เป็นฟังก์ชันที่ใช้ส่ง HTTP request ไปยัง back-end
@@ -35,7 +29,6 @@ const LoginScreen = ({ navigation }) => {
         method: 'POST', //HTTP method
         headers: { 'Content-Type': 'application/json' }, //ระบุว่าส่งข้อมูลไปในรูปแบบ JSON.
         body: JSON.stringify(loginData), // แปลง Object(loginData) เป็น JSON string เพื่อส่งไปยัง server.
->>>>>>> origin/main
       });
 
       // ตรวจสอบว่าการส่ง request ไปยัง server สำเร็จหรือไม่
